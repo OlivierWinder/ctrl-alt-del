@@ -1,0 +1,452 @@
+/* SETUP */
+:root {
+    --win-bg: #008080;
+    /* desktop teal */
+    --win-gray: #c0c0c0;
+    /* window background */
+    --win-light: #ffffff;
+    /* highlight */
+    --win-dark: #808080;
+    /* shadow */
+    --win-darker: #404040;
+    /* deep shadow */
+    --win-blue: #000080;
+    /* title bar */
+    --win-text: #000000;
+}
+
+/* LAYOUT */
+body {
+    font-family: "MS Sans Serif", "Tahoma", "Arial", sans-serif;
+    color: var(--win-text);
+    margin: 0;
+    overflow: hidden;
+    font-size: 13px;
+}
+
+.desktop {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background-image: url("/RESOURCES/windows_bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    /* Prevent any scrolling */
+}
+
+/* ICONS */
+.desktop__icon {
+    position: absolute;
+    width: 78px;
+    height: auto;
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    cursor: default;
+    user-select: none;
+    cursor: pointer;
+    padding: 6px;
+}
+
+.desktop__icon__img {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+}
+
+/* .desktop__icon__span { margin-top: 4px; } */
+/* Highlight for selected icon */
+.desktop__icon.selected {
+    background: rgba(0, 0, 255, 0.4);
+    /* blue opaque overlay */
+    border-radius: 4px;
+    /* slightly round corners like Windows 98 */
+    z-index: 1000;
+}
+
+.desktop__icon.selected .desktop__icon__span {
+    color: white;
+}
+
+/* WINDOW */
+.window {
+    position: absolute;
+    background: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-darker);
+}
+
+.window__button {
+    background: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+.window__button:active {
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+/* TITLE BAR */
+.title_bar {
+    height: 22px;
+    background: var(--win-blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+    font-weight: bold;
+    cursor: move;
+}
+
+/* TITLE BAR BUTTONS */
+.title_bar__button {
+    width: 16px;
+    height: 14px;
+    background: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    padding: 0;
+}
+
+/* FOOTER */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 46px;
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    box-shadow: inset 1px 1px #ffffff, inset -1px -1px #808080;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    z-index: 1000;
+}
+
+.footer__start_btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 36px;
+    padding: 0 6px;
+    background: var(--win-gray);
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    cursor: pointer;
+}
+
+.footer__start_btn:active {
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.footer__start_btn__img {
+    width: 26px;
+    height: 26px;
+    image-rendering: pixelated;
+}
+
+.footer__items {
+    flex: 1;
+    height: 36px;
+    margin: 0 6px;
+    background: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.footer__clock {
+    height: 36px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    background: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+/* WINDOWS*/
+.window {
+    position: absolute;
+    width: 400px;
+    height: 300px;
+    background: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-darker);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    /* hidden initially */
+    z-index: 600;
+    /* above overlay */
+}
+
+.window__title_bar {
+    height: 22px;
+    background: var(--win-blue);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+    font-weight: bold;
+    cursor: move;
+}
+
+.title_bar__button {
+    width: 16px;
+    height: 14px;
+    background: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    padding: 0;
+    font-size: 10px;
+    line-height: 12px;
+    text-align: center;
+}
+
+.title_bar__button:active {
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+/* VIRUS VIDEO */
+#virus {
+    position: fixed;
+    /* stay on top of everything */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    /* full viewport width */
+    height: 100vh;
+    /* full viewport height */
+    z-index: 9999;
+    /* above all other windows */
+    object-fit: cover;
+    /* scale video to cover full screen */
+}
+
+/* DOCUMENTS WINDOW */
+
+.window--documents {
+    width: 900px;
+    height: 400px;
+    /* reduced from 650px */
+    background: var(--win-gray);
+    display: none;
+    z-index: 600;
+}
+
+/* MENU BAR */
+
+.window__menu {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 0 20px;
+    background: #d4d0c8;
+    border-bottom: 2px solid #b5b5b5;
+    font-size: 18px;
+}
+
+/* TOOLBAR */
+
+.window__toolbar {
+    height: 54px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding: 0 20px;
+    background: #d4d0c8;
+    border-bottom: 2px solid #b5b5b5;
+    font-size: 20px;
+}
+
+
+/* ADDRESS BAR */
+
+.window__address {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 20px;
+    background: #d4d0c8;
+    border-bottom: 2px solid #b5b5b5;
+    font-size: 18px;
+}
+
+.window__address_bar {
+    flex: 1;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    background: white;
+    border: 2px solid;
+    border-color:
+        var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+/* CONTENT AREA */
+
+.window__content {
+    display: grid;
+    grid-template-columns: repeat(3, 78px);
+    /* 3 icons per row */
+    gap: 52px 64px;
+    /* smaller spacing between rows and columns */
+    padding: 32px;
+    background: #efefef;
+    /* height: calc(100% - 168px); */
+    height: 100%;
+    align-content: start;
+    justify-content: start;
+}
+
+/* FOLDER ITEMS */
+
+.window__folder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+
+    font-size: 16px;
+    /* same as desktop icons */
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
+    width: 78px;
+    /* same width as desktop icons */
+}
+
+.window__folder img {
+    width: 78px;
+    /* same size as desktop icon image */
+    height: 78px;
+    image-rendering: pixelated;
+}
+
+.window__folder span {
+    display: block;
+    width: 100%;
+    line-height: 1.2;
+}
+
+/* ================================================= */
+/* CD PLAYER WINDOW — FINAL VERSION */
+/* ================================================= */
+
+.window--cdplayer {
+    width: 760px;
+    height: 520px;
+    background: #d4d0c8;
+    display: none;
+    z-index: 9999;
+}
+
+/* MAIN LAYOUT */
+
+.cd_player {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+/* TOP SECTION */
+
+.cd_player__top {
+    display: flex;
+    align-items: flex-end;
+    gap: 28px;
+}
+
+/* COVER IMAGE */
+
+.cd_player__cover {
+    width: 230px;
+    height: 230px;
+    background: white;
+
+    border: 2px solid;
+    border-color:
+        var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.cd_player__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* PLAY BUTTON */
+
+.cd_player__play {
+    width: 170px;
+    height: 70px;
+    font-size: 30px;
+    background: var(--win-gray);
+    cursor: pointer;
+
+    border: 2px solid;
+    border-color:
+        var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+}
+
+.cd_player__play:active {
+    border-color:
+        var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+/* BOTTOM INFO SECTION */
+
+.cd_player__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* EACH ROW */
+
+.cd_player__row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.cd_player__label {
+    width: 110px;
+    font-size: 28px;
+    font-weight: normal;
+}
+
+/* WINDOWS STYLE INPUT BOX */
+
+.cd_player__box {
+    flex: 1;
+    height: 64px;
+    background: white;
+    display: flex;
+    align-items: center;
+    padding: 0 22px;
+    font-size: 34px;
+
+    border: 2px solid;
+    border-color:
+        var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}

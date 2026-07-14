@@ -1,0 +1,100 @@
+/* ================================================= */
+/* PDF VIEWER                                        */
+/* ================================================= */
+
+.window--pdf {
+    width: auto;
+    min-width: 280px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.pdf-viewer {
+    flex: 1;
+    min-height: 0;
+    background: #808080;
+    padding: 0;
+    overflow: hidden;
+}
+
+.pdf-viewer__viewport {
+    display: flex;
+    gap: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.pdf-viewer__scroll {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    background: #808080;
+}
+
+.pdf-viewer__scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.pdf-viewer__pages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 16px;
+}
+
+.pdf-viewer__page {
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    background: #ffffff;
+    border: 2px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+    display: block;
+    flex-shrink: 0;
+}
+
+.pdf-viewer__status {
+    color: #ffffff;
+    font-size: 14px;
+    padding: 24px;
+}
+
+/* Win98 custom scrollbar */
+.pdf-viewer__track {
+    width: 16px;
+    flex-shrink: 0;
+    align-self: stretch;
+    position: relative;
+    background: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+    box-shadow: inset 1px 1px var(--win-darker);
+    cursor: pointer;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.pdf-viewer__thumb {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--win-gray);
+    border: 1px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    cursor: grab;
+}
+
+.pdf-viewer__thumb:active {
+    cursor: grabbing;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+    border-width: 1px;
+}

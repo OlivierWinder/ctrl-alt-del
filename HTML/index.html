@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTR_ALT_DEL</title>
+    <link rel="stylesheet" href="/CSS/reset.css">
+    <link rel="stylesheet" href="/CSS/main.css">
+</head>
+
+<body>
+
+    <main class="desktop">
+
+        <!-- ================================================= -->
+        <!-- DESKTOP ICON 1 : DOCUMENTS -->
+        <!-- ================================================= -->
+
+        <div class="desktop__icon" data-window="documents">
+            <img src="/RESOURCES/folder.png" alt="" class="desktop__icon__img">
+            <span class="desktop__icon__span">
+                DOCUMENTS
+            </span>
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- MAIN DOCUMENTS WINDOW -->
+        <!-- ================================================= -->
+
+        <div class="window window--documents" id="documents">
+
+            <div class="window__title_bar">
+                DOCUMENTS
+                <button class="title_bar__button">X</button>
+            </div>
+
+            <div class="window__address">
+                <span>Address</span>
+                <div class="window__address_bar">
+                    Documents
+                </div>
+            </div>
+
+            <div class="window__content">
+
+                <div class="window__folder" data-window="recent">
+                    <img src="/RESOURCES/recent_icon.png" alt="">
+                    <span>Recent</span>
+                </div>
+
+                <div class="window__folder" data-window="desktop_folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>Desktop</span>
+                </div>
+
+                <div class="window__folder" data-window="documents_inner">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>Documents</span>
+                </div>
+
+                <div class="window__folder" data-window="downloads">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>Downloads</span>
+                </div>
+
+                <div class="window__folder" data-window="ep_demos">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>EP DEMOS</span>
+                </div>
+
+                <div class="window__folder" data-window="this_computer">
+                    <img src="/RESOURCES/folder_thiscomputer.png" alt="">
+                    <span>This Computer</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- INNER FOLDER WINDOWS -->
+        <!-- ================================================= -->
+
+        <div class="window window--documents" id="recent">
+            <div class="window__title_bar">
+                Recent
+                <button class="title_bar__button">X</button>
+            </div>
+
+            <div class="window__address">
+                <span>Address</span>
+                <div class="window__address_bar">Recent</div>
+            </div>
+
+            <div class="window__content">
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>session_01</span>
+                </div>
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>drafts</span>
+                </div>
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>archive</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="window window--documents" id="desktop_folder">
+            <div class="window__title_bar">
+                Desktop
+                <button class="title_bar__button">X</button>
+            </div>
+
+            <div class="window__address">
+                <span>Address</span>
+                <div class="window__address_bar">Desktop</div>
+            </div>
+
+            <div class="window__content">
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>ideas</span>
+                </div>
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>renders</span>
+                </div>
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>tests</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="window window--documents" id="documents_inner">
+            <div class="window__title_bar">
+                Documents
+                <button class="title_bar__button">X</button>
+            </div>
+
+            <div class="window__address">
+                <span>Address</span>
+                <div class="window__address_bar">Documents</div>
+            </div>
+
+            <div class="window__content">
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>lyrics</span>
+                </div>
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>references</span>
+                </div>
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>mix_notes</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="window window--documents" id="downloads">
+            <div class="window__title_bar">
+                Downloads
+                <button class="title_bar__button">X</button>
+            </div>
+
+            <div class="window__address">
+                <span>Address</span>
+                <div class="window__address_bar">Downloads</div>
+            </div>
+
+            <div class="window__content">
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>samples</span>
+                </div>
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>textures</span>
+                </div>
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder.png" alt="">
+                    <span>plugins</span>
+                </div>
+            </div>
+        </div>
+
+
+<!-- ================================================= -->
+<!-- EP DEMOS WINDOW -->
+<!-- ================================================= -->
+
+<div class="window window--documents" id="ep_demos">
+    <div class="window__title_bar">
+        EP DEMOS
+        <button class="title_bar__button">X</button>
+    </div>
+
+    <div class="window__address">
+        <span>Address</span>
+        <div class="window__address_bar">EP DEMOS</div>
+    </div>
+
+    <div class="window__content">
+
+        <!-- TRACK 1 OPENS CD PLAYER -->
+        <div class="window__folder" data-window="cd_player">
+            <img src="/RESOURCES/folder.png" alt="">
+            <span>track_01.mp3</span>
+        </div>
+
+        <div class="window__folder">
+            <img src="/RESOURCES/folder.png" alt="">
+            <span>track_02.mp3</span>
+        </div>
+
+        <div class="window__folder">
+            <img src="/RESOURCES/folder.png" alt="">
+            <span>track_03.mp3</span>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ================================================= -->
+<!-- CD PLAYER WINDOW -->
+<!-- ================================================= -->
+
+<div class="window window--cdplayer" id="cd_player">
+
+    <div class="window__title_bar">
+        CD Player
+        <button class="title_bar__button">X</button>
+    </div>
+
+    <div class="cd_player">
+
+        <div class="cd_player__cover">
+            <img src="/RESOURCES/song_cover.jpg" alt="">
+        </div>
+
+        <div class="cd_player__info">
+            <h2>LÈSSEN</h2>
+            <p>a tryer is a winner</p>
+        </div>
+
+        <button class="cd_player__play" id="playPauseBtn">
+            PLAY
+        </button>
+
+        <audio id="audioPlayer">
+            <source src="/RESOURCES/mantra.wav" type="audio/wav">
+        </audio>
+
+    </div>
+
+</div>
+
+
+        <div class="window window--documents" id="this_computer">
+            <div class="window__title_bar">
+                This Computer
+                <button class="title_bar__button">X</button>
+            </div>
+
+            <div class="window__address">
+                <span>Address</span>
+                <div class="window__address_bar">This Computer</div>
+            </div>
+
+            <div class="window__content">
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder_thiscomputer.png" alt="">
+                    <span>Local Disk (C:)</span>
+                </div>
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder_thiscomputer.png" alt="">
+                    <span>Drive (D:)</span>
+                </div>
+                <div class="window__folder">
+                    <img src="/RESOURCES/folder_thiscomputer.png" alt="">
+                    <span>Backup</span>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- DESKTOP ICON 2 -->
+        <!-- ================================================= -->
+
+        <div class="desktop__icon" data-window="rat_race_revolution">
+            <img src="/RESOURCES/folder.png" alt="" class="desktop__icon__img">
+            <span class="desktop__icon__span">
+                RAT RACE EVOLUTION
+            </span>
+        </div>
+
+        <div class="window" id="rat_race_revolution">
+            <div class="window__title_bar">
+                RAT RACE REVOLUTION
+                <button class="title_bar__button">X</button>
+            </div>
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- DESKTOP ICON 3 -->
+        <!-- ================================================= -->
+
+        <div class="desktop__icon" data-window="notes">
+            <img src="/RESOURCES/folder.png" alt="" class="desktop__icon__img">
+            <span class="desktop__icon__span">
+                NOTES
+            </span>
+        </div>
+
+        <div class="window" id="notes">
+            <div class="window__title_bar">
+                NOTES
+                <button class="title_bar__button">X</button>
+            </div>
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- DESKTOP ICON 4 -->
+        <!-- ================================================= -->
+
+        <div class="desktop__icon" data-window="bank_balance">
+            <img src="/RESOURCES/folder.png" alt="" class="desktop__icon__img">
+            <span class="desktop__icon__span">
+                BANK BALANCE
+            </span>
+        </div>
+
+        <div class="window" id="bank_balance">
+            <div class="window__title_bar">
+                BANK BALANCE
+                <button class="title_bar__button">X</button>
+            </div>
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- DESKTOP ICON 5 -->
+        <!-- ================================================= -->
+
+        <div class="desktop__icon" data-window="image">
+            <img src="/RESOURCES/folder.png" alt="" class="desktop__icon__img">
+            <span class="desktop__icon__span">
+                PLACEHOLDER.img
+            </span>
+        </div>
+
+        <div class="window" id="image">
+            <div class="window__title_bar">
+                IMAGE
+                <button class="title_bar__button">X</button>
+            </div>
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- DESKTOP ICON 6 : VIRUS -->
+        <!-- ================================================= -->
+
+        <div class="desktop__icon" data-window="virus">
+            <img src="/RESOURCES/folder.png" alt="" class="desktop__icon__img">
+            <span class="desktop__icon__span">
+                VIRUS
+            </span>
+        </div>
+
+        <video id="virus" class="virus_video" autoplay style="display:none;">
+            <source src="/RESOURCES/crash.mov" type="video/mp4">
+        </video>
+
+    </main>
+
+
+    <footer class="footer">
+
+        <button class="footer__start_btn">
+            <img src="/RESOURCES/windows_icon.png" alt="" class="footer__start_btn__img">
+            Start
+        </button>
+
+        <div class="footer__items"></div>
+
+        <div class="footer__clock">
+            23:41
+        </div>
+
+    </footer>
+
+    <script src="/JS/main.js"></script>
+
+</body>
+
+</html>
