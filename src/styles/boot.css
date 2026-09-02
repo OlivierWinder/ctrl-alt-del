@@ -41,13 +41,12 @@
   display: block;
   width: min(92vw, 720px);
   height: auto;
-  margin-bottom: -4px;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
 .boot-start__meta {
-  margin: 0;
+  margin: 40px 0 0;
   font-family: "Courier New", Courier, monospace;
   font-size: clamp(13px, 2vw, 17px);
   line-height: 1;
