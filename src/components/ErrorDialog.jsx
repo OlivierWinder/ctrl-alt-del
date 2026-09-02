@@ -4,12 +4,27 @@ import { assetUrl } from '../utils/assetUrl';
 export default function ErrorDialog({
   title = 'System Error',
   message,
+  actions,
+  icon = '/RESOURCES/msg_warning.png',
   zIndex,
   containerRef,
   stackOffset = 0,
   onClose,
   onFocus,
+  onAction,
 }) {
+  const buttons = actions?.length
+    ? actions
+    : [{ id: 'ok', label: 'Ok' }];
+
+  function handleAction(actionId) {
+    if (onAction) {
+      onAction(actionId);
+      return;
+    }
+    onClose?.();
+  }
+
   return (
     <Window
       title={title}
@@ -23,7 +38,7 @@ export default function ErrorDialog({
       <div className="error-dialog">
         <div className="error-dialog__body">
           <img
-            src={assetUrl('/RESOURCES/msg_warning.png')}
+            src={assetUrl(icon || '/RESOURCES/msg_warning.png')}
             alt=""
             className="error-dialog__icon"
           />
@@ -31,13 +46,16 @@ export default function ErrorDialog({
         </div>
 
         <div className="error-dialog__actions">
-          <button
-            type="button"
-            className="error-dialog__cancel"
-            onClick={onClose}
-          >
-            Ok
-          </button>
+          {buttons.map((action) => (
+            <button
+              key={action.id}
+              type="button"
+              className="error-dialog__cancel"
+              onClick={() => handleAction(action.id)}
+            >
+              {action.label}
+            </button>
+          ))}
         </div>
       </div>
     </Window>

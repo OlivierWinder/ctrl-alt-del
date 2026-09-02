@@ -9,13 +9,13 @@ export default function BootSequence() {
   const [phase, setPhase] = useState('start'); // start | blackout | desktop
 
   if (!BOOT_SEQUENCE_ENABLED) {
-    return <Desktop />;
+    return <Desktop isActive />;
   }
 
   return (
     <>
       <div className={phase === 'desktop' ? 'boot-desktop' : 'boot-preload'}>
-        <Desktop />
+        <Desktop isActive={phase === 'desktop'} />
       </div>
 
       {phase === 'start' && (

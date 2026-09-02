@@ -9,10 +9,12 @@ import NotesApp from './NotesApp';
 import EmailApp from './EmailApp';
 import SimpleWindow from './SimpleWindow';
 import VirusVideo from './VirusVideo';
+import FakeAdOverlay from './FakeAdOverlay';
 import Taskbar from './Taskbar';
 import { desktopIcons, folderWindows } from '../data/content';
 import { useWindowManager } from '../hooks/useWindowManager';
 import { useErrorTriggers, triggerErrorAction } from '../hooks/useErrorTriggers';
+import { useFakeAds } from '../hooks/useFakeAds';
 import { getFolderLabel, isFolderWindow } from '../utils/folderNavigation';
 
 const ICON_START_Y = 18;
@@ -43,7 +45,7 @@ function getIconPositions() {
   }, {});
 }
 
-export default function Desktop() {
+export default function Desktop({ isActive = true }) {
   const desktopRef = useRef(null);
   const [selectedIconId, setSelectedIconId] = useState(null);
   const {
@@ -62,9 +64,31 @@ export default function Desktop() {
     toggleMinimize,
   } = useWindowManager();
 
-  useErrorTriggers(openErrorDialog);
+  useErrorTriggers(openErrorDialog, isActive);
+  const {
+    currentAd,
+    dismissAd,
+    showConnectionPrompt,
+    handleConnectionChoice,
+  } = useFakeAds({ isActive });
 
   const iconPositions = useMemo(() => getIconPositions(), []);
+
+  function handleErrorAction(win, actionId) {
+    closeWindow(win.instanceId);
+
+    if (actionId === 'online') {
+      triggerErrorAction(openErrorDialog, 'internet');
+    }
+  }
+
+  function handleAdConnectionChoice(choice) {
+    handleConnectionChoice(choice);
+
+    if (choice === 'online') {
+      triggerErrorAction(openErrorDialog, 'internet');
+    }
+  }
 
   function handleDesktopMouseDown(event) {
     if (!event.target.closest('.desktop__icon')) {
@@ -246,6 +270,9 @@ export default function Desktop() {
                 {...shared}
                 title={win.title}
                 message={win.message}
+                actions={win.actions}
+                icon={win.icon}
+                onAction={(actionId) => handleErrorAction(win, actionId)}
               />
             );
           }
@@ -275,6 +302,14 @@ export default function Desktop() {
         <VirusVideo
           isOpen={Boolean(aiWindow)}
           onClose={() => aiWindow && closeWindow(aiWindow.instanceId)}
+        />
+
+        <FakeAdOverlay
+          src={currentAd}
+          onClose={dismissAd}
+          containerRef={desktopRef}
+          showConnectionPrompt={showConnectionPrompt}
+          onConnectionChoice={handleAdConnectionChoice}
         />
       </main>
 

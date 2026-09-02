@@ -10,11 +10,12 @@ function randomDelay() {
 
 /**
  * Schedules time-based, random, and inactivity error dialogs for the session.
+ * Timers only run while the desktop session is active (after boot).
  * Action triggers (internet, rat race, log off) are handled by the caller via triggerErrorAction.
  */
-export function useErrorTriggers(openErrorDialog) {
+export function useErrorTriggers(openErrorDialog, isActive = true) {
   useEffect(() => {
-    if (!openErrorDialog) return undefined;
+    if (!isActive || !openErrorDialog) return undefined;
 
     const timers = [];
 
@@ -31,10 +32,10 @@ export function useErrorTriggers(openErrorDialog) {
     return () => {
       for (const timer of timers) window.clearTimeout(timer);
     };
-  }, [openErrorDialog]);
+  }, [openErrorDialog, isActive]);
 
   useEffect(() => {
-    if (!openErrorDialog) return undefined;
+    if (!isActive || !openErrorDialog) return undefined;
 
     const inactivityError = errors.find((error) => error.triggerType === 'inactivity');
     if (!inactivityError) return undefined;
@@ -60,7 +61,7 @@ export function useErrorTriggers(openErrorDialog) {
         window.removeEventListener(eventName, armTimer);
       }
     };
-  }, [openErrorDialog]);
+  }, [openErrorDialog, isActive]);
 }
 
 export function triggerErrorAction(openErrorDialog, action) {

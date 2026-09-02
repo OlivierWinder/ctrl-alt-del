@@ -160,6 +160,8 @@ export function useWindowManager() {
               ...win,
               title: error.title,
               message: error.message,
+              actions: error.actions || null,
+              icon: error.icon || null,
               zIndex,
               minimized: false,
             }
@@ -178,6 +180,8 @@ export function useWindowManager() {
           appId: error.id,
           title: error.title,
           message: error.message,
+          actions: error.actions || null,
+          icon: error.icon || null,
           zIndex,
           stackIndex: current.length,
           minimized: false,
