@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { virusVideo } from '../data/content';
+import { assetUrl } from '../utils/assetUrl';
 
 export default function VirusVideo({ isOpen, onClose }) {
   const videoRef = useRef(null);
@@ -20,7 +21,7 @@ export default function VirusVideo({ isOpen, onClose }) {
       autoPlay
       onEnded={onClose}
     >
-      <source src={virusVideo.src} type="video/mp4" />
+      <source src={assetUrl(virusVideo.src)} type="video/mp4" />
     </video>
   );
 }

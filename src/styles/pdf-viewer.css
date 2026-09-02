@@ -35,6 +35,10 @@
     background: #808080;
 }
 
+.pdf-viewer__scroll--locked {
+    overflow-y: hidden;
+}
+
 .pdf-viewer__scroll::-webkit-scrollbar {
     display: none;
 }

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import startupLogo from '../assets/startup_logo.jpg';
+import { assetUrl } from '../utils/assetUrl';
 
 const BOOT_DURATION_MS = 3500;
 
@@ -12,7 +12,7 @@ export default function BootSplash({ onComplete }) {
   return (
     <div className="boot-splash">
       <img
-        src={startupLogo}
+        src={assetUrl('/RESOURCES/startup_logo_new.png')}
         alt="CTRL-ALT-DEL Operating System"
         className="boot-splash__logo"
       />

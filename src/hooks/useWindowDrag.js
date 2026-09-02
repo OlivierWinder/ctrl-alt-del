@@ -2,17 +2,18 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 const TASKBAR_HEIGHT = 46;
 
-function getCenteredPosition(container, windowEl) {
+function getCenteredPosition(container, windowEl, stackOffset = 0) {
   const winWidth = windowEl.offsetWidth;
   const winHeight = windowEl.offsetHeight;
+  const step = 28;
 
   return {
-    x: Math.max(0, (container.clientWidth - winWidth) / 2),
-    y: Math.max(0, (container.clientHeight - winHeight) / 2),
+    x: Math.max(0, (container.clientWidth - winWidth) / 2 + stackOffset * step),
+    y: Math.max(0, (container.clientHeight - winHeight) / 2 + stackOffset * step),
   };
 }
 
-export function useWindowDrag(containerRef, windowRef, recenterKey) {
+export function useWindowDrag(containerRef, windowRef, recenterKey, stackOffset = 0) {
   const [position, setPosition] = useState(null);
   const isDragging = useRef(false);
   const hasBeenDragged = useRef(false);
@@ -20,8 +21,8 @@ export function useWindowDrag(containerRef, windowRef, recenterKey) {
 
   const centerWindow = useCallback(() => {
     if (!windowRef.current || !containerRef.current || hasBeenDragged.current) return;
-    setPosition(getCenteredPosition(containerRef.current, windowRef.current));
-  }, [containerRef, windowRef]);
+    setPosition(getCenteredPosition(containerRef.current, windowRef.current, stackOffset));
+  }, [containerRef, windowRef, stackOffset]);
 
   useLayoutEffect(() => {
     hasBeenDragged.current = false;

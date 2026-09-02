@@ -1,0 +1,70 @@
+/* ================================================= */
+/* ERROR DIALOG                                      */
+/* ================================================= */
+
+.window--error {
+    width: 420px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.error-dialog {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px 14px 16px;
+    background: var(--win-gray);
+}
+
+.error-dialog__body {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 14px;
+}
+
+.error-dialog__icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    image-rendering: pixelated;
+    display: block;
+}
+
+.error-dialog__message {
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    line-height: 1.35;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+
+.error-dialog__actions {
+    display: flex;
+    justify-content: center;
+}
+
+.error-dialog__cancel {
+    min-width: 88px;
+    height: 28px;
+    padding: 0 18px;
+    font-size: 13px;
+    background: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
+}
+
+.error-dialog__cancel:active {
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}

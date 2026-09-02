@@ -3,18 +3,23 @@ import DesktopIcon from './DesktopIcon';
 import FolderWindow from './FolderWindow';
 import CDPlayer from './CDPlayer';
 import PdfViewer from './PdfViewer';
+import ImageViewer from './ImageViewer';
+import ErrorDialog from './ErrorDialog';
+import NotesApp from './NotesApp';
+import EmailApp from './EmailApp';
 import SimpleWindow from './SimpleWindow';
 import VirusVideo from './VirusVideo';
 import Taskbar from './Taskbar';
-import { desktopIcons, folderWindows, pdfWindows, simpleWindows } from '../data/content';
+import { desktopIcons, folderWindows } from '../data/content';
 import { useWindowManager } from '../hooks/useWindowManager';
+import { useErrorTriggers, triggerErrorAction } from '../hooks/useErrorTriggers';
 import { getFolderLabel, isFolderWindow } from '../utils/folderNavigation';
 
-const ICON_START_Y = 20;
-const ICON_GAP_Y = 120;
-const ICON_LEFT_X = 20;
-const ICON_RIGHT_PADDING = 24;
-const ICON_WIDTH = 90;
+const ICON_START_Y = 18;
+const ICON_GAP_Y = 108;
+const ICON_LEFT_X = 18;
+const ICON_RIGHT_PADDING = 22;
+const ICON_WIDTH = 101;
 
 function getIconPositions() {
   const rightX = window.innerWidth - ICON_WIDTH - ICON_RIGHT_PADDING;
@@ -42,20 +47,22 @@ export default function Desktop() {
   const desktopRef = useRef(null);
   const [selectedIconId, setSelectedIconId] = useState(null);
   const {
-    openWindowId,
-    zIndex,
-    cdAutoplay,
-    isMinimized,
-    folderPath,
-    canFolderBack,
-    canFolderForward,
+    windows,
+    focusedId,
     openWindow,
+    openPdfView,
+    openImageView,
+    openAudioView,
+    openErrorDialog,
     navigateFolder,
     folderBack,
     folderForward,
     closeWindow,
+    focusWindow,
     toggleMinimize,
   } = useWindowManager();
+
+  useErrorTriggers(openErrorDialog);
 
   const iconPositions = useMemo(() => getIconPositions(), []);
 
@@ -73,6 +80,16 @@ export default function Desktop() {
       return;
     }
 
+    if (id === 'internet' || id === 'rat_race_revolution') {
+      triggerErrorAction(openErrorDialog, id);
+      return;
+    }
+
+    if (id === 'listen') {
+      navigateFolder('music_ep_demos', ['FILES', 'Music', 'EP_DEMOS']);
+      return;
+    }
+
     if (isFolderWindow(id)) {
       navigateFolder(id, [getFolderLabel(id)]);
       return;
@@ -81,20 +98,48 @@ export default function Desktop() {
     openWindow(id);
   }
 
-  function handleOpenFolderItem(id, options = {}) {
-    if (isFolderWindow(id)) {
-      navigateFolder(id, [...folderPath, getFolderLabel(id)], options);
+  function handleOpenFolderItem(item, folderInstanceId) {
+    if (item.pdf) {
+      openPdfView(item.label, item.pdf);
       return;
     }
 
-    openWindow(id, options);
+    if (item.image) {
+      openImageView(item.label, item.image);
+      return;
+    }
+
+    if (item.audio || item.opens === 'cd_player') {
+      openAudioView(
+        {
+          title: item.label.replace(/\.(mp3|wav)$/i, ''),
+          subtitle: 'a tryer is a winner',
+          audio: item.audio,
+        },
+        { autoplay: true },
+      );
+      return;
+    }
+
+    if (!item.opens) return;
+
+    const folderWin = windows.find((win) => win.instanceId === folderInstanceId);
+    const currentPath = folderWin?.folderNav?.path || [];
+
+    if (isFolderWindow(item.opens)) {
+      navigateFolder(
+        item.opens,
+        [...currentPath, getFolderLabel(item.opens)],
+        { autoplay: item.autoplay },
+        folderInstanceId,
+      );
+      return;
+    }
+
+    openWindow(item.opens);
   }
 
-  const isAiOpen = openWindowId === 'ai';
-  const folderConfig = folderWindows[openWindowId];
-  const simpleConfig = simpleWindows[openWindowId];
-  const pdfConfig = pdfWindows[openWindowId];
-  const isCdPlayerOpen = openWindowId === 'cd_player';
+  const aiWindow = windows.find((win) => win.type === 'ai' && !win.minimized);
 
   return (
     <>
@@ -111,60 +156,128 @@ export default function Desktop() {
           />
         ))}
 
-        {folderConfig && !isMinimized && (
-          <FolderWindow
-            key={openWindowId}
-            config={folderConfig}
-            zIndex={zIndex}
-            containerRef={desktopRef}
-            folderPath={folderPath}
-            canGoBack={canFolderBack}
-            canGoForward={canFolderForward}
-            onBack={folderBack}
-            onForward={folderForward}
-            onClose={closeWindow}
-            onOpenItem={handleOpenFolderItem}
-          />
-        )}
+        {windows.map((win) => {
+          if (win.minimized) return null;
 
-        {isCdPlayerOpen && !isMinimized && (
-          <CDPlayer
-            key="cd_player"
-            zIndex={zIndex}
-            containerRef={desktopRef}
-            autoplay={cdAutoplay}
-            onClose={closeWindow}
-          />
-        )}
+          const shared = {
+            key: win.instanceId,
+            zIndex: win.zIndex,
+            containerRef: desktopRef,
+            stackOffset: win.stackIndex,
+            onClose: () => closeWindow(win.instanceId),
+            onFocus: () => focusWindow(win.instanceId),
+          };
 
-        {pdfConfig && !isMinimized && (
-          <PdfViewer
-            key={openWindowId}
-            title={pdfConfig.title}
-            pdfSrc={pdfConfig.pdf}
-            zIndex={zIndex}
-            containerRef={desktopRef}
-            onClose={closeWindow}
-          />
-        )}
+          if (win.type === 'folder') {
+            const config = folderWindows[win.appId];
+            if (!config) return null;
+            const nav = win.folderNav;
+            return (
+              <FolderWindow
+                {...shared}
+                config={config}
+                folderPath={nav.path}
+                canGoBack={nav.index > 0}
+                canGoForward={nav.index < nav.history.length - 1}
+                onBack={() => folderBack(win.instanceId)}
+                onForward={() => folderForward(win.instanceId)}
+                onOpenItem={(item) => handleOpenFolderItem(item, win.instanceId)}
+              />
+            );
+          }
 
-        {simpleConfig && !isMinimized && (
-          <SimpleWindow
-            key={openWindowId}
-            title={simpleConfig.title}
-            zIndex={zIndex}
-            containerRef={desktopRef}
-            onClose={closeWindow}
-          />
-        )}
+          if (win.type === 'image') {
+            return (
+              <ImageViewer
+                {...shared}
+                title={win.title}
+                imageSrc={win.image}
+              />
+            );
+          }
 
-        <VirusVideo isOpen={isAiOpen && !isMinimized} onClose={closeWindow} />
+          if (win.type === 'pdf') {
+            return (
+              <PdfViewer
+                {...shared}
+                title={win.title}
+                pdfSrc={win.pdf}
+              />
+            );
+          }
+
+          if (win.type === 'cd_player') {
+            return (
+              <CDPlayer
+                {...shared}
+                autoplay={win.autoplay}
+                track={win.track}
+                onEject={() => triggerErrorAction(openErrorDialog, 'cd_eject')}
+              />
+            );
+          }
+
+          if (win.type === 'notes') {
+            return (
+              <NotesApp
+                {...shared}
+                title={win.title}
+              />
+            );
+          }
+
+          if (win.type === 'email') {
+            return (
+              <EmailApp
+                {...shared}
+                title={win.title}
+              />
+            );
+          }
+
+          if (win.type === 'error') {
+            return (
+              <ErrorDialog
+                {...shared}
+                title={win.title}
+                message={win.message}
+              />
+            );
+          }
+
+          if (win.type === 'simple') {
+            if (win.image) {
+              return (
+                <ImageViewer
+                  {...shared}
+                  title={win.title}
+                  imageSrc={win.image}
+                />
+              );
+            }
+
+            return (
+              <SimpleWindow
+                {...shared}
+                title={win.title}
+              />
+            );
+          }
+
+          return null;
+        })}
+
+        <VirusVideo
+          isOpen={Boolean(aiWindow)}
+          onClose={() => aiWindow && closeWindow(aiWindow.instanceId)}
+        />
       </main>
 
       <Taskbar
-        openWindowId={openWindowId}
-        isMinimized={isMinimized}
+        windows={windows}
+        focusedId={focusedId}
         onTaskbarClick={toggleMinimize}
+        onLogOff={() => triggerErrorAction(openErrorDialog, 'log_off')}
       />
     </>
   );

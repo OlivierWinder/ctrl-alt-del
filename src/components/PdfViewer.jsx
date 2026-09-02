@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import Window from './Window';
+import { assetUrl } from '../utils/assetUrl';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-const MAX_PAGE_WIDTH = 400;
+const MAX_PAGE_WIDTH = 470;
 const PAGE_GAP = 20;
 const PAGE_PEEK = 32;
 const THUMB_HEIGHT = 100;
@@ -15,21 +16,30 @@ const PAGE_MARGIN = 16;
 const EMPTY_LAYOUT = {
   pages: [],
   viewportHeight: 320,
-  windowWidth: 500,
+  windowWidth: 560,
+  hasMultiplePages: false,
 };
 
 function getScale(baseViewport) {
   return MAX_PAGE_WIDTH / baseViewport.width;
 }
 
-export default function PdfViewer({ title, pdfSrc, zIndex, containerRef, onClose }) {
+export default function PdfViewer({
+  title,
+  pdfSrc,
+  zIndex,
+  containerRef,
+  stackOffset = 0,
+  onClose,
+  onFocus,
+}) {
   const scrollRef = useRef(null);
   const [layout, setLayout] = useState(EMPTY_LAYOUT);
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState({ scrollTop: 0, scrollHeight: 0, clientHeight: 0 });
   const dragState = useRef(null);
 
-  const { pages, viewportHeight, windowWidth } = layout;
+  const { pages, viewportHeight, windowWidth, hasMultiplePages } = layout;
 
   useEffect(() => {
     let cancelled = false;
@@ -39,7 +49,7 @@ export default function PdfViewer({ title, pdfSrc, zIndex, containerRef, onClose
       setLayout(EMPTY_LAYOUT);
 
       try {
-        const response = await fetch(pdfSrc);
+        const response = await fetch(assetUrl(pdfSrc));
         if (!response.ok) {
           throw new Error(`Failed to fetch PDF (${response.status})`);
         }
@@ -74,15 +84,16 @@ export default function PdfViewer({ title, pdfSrc, zIndex, containerRef, onClose
 
         const firstPageHeight = renderedPages[0].height;
         const contentWidth = Math.max(...renderedPages.map((page) => page.width));
-        const hasMultiplePages = pdf.numPages > 1;
+        const multiPage = pdf.numPages > 1;
         const nextViewportHeight = firstPageHeight
-          + (hasMultiplePages ? PAGE_PEEK : 0)
+          + (multiPage ? PAGE_PEEK : 0)
           + PAGE_MARGIN * 2;
 
         setLayout({
           pages: renderedPages,
           viewportHeight: nextViewportHeight,
-          windowWidth: contentWidth + SCROLLBAR_WIDTH + PAGE_MARGIN * 2,
+          windowWidth: contentWidth + PAGE_MARGIN * 2 + (multiPage ? SCROLLBAR_WIDTH : 0),
+          hasMultiplePages: multiPage,
         });
         setLoading(false);
       } catch (error) {
@@ -128,10 +139,11 @@ export default function PdfViewer({ title, pdfSrc, zIndex, containerRef, onClose
   }, [pages, loading, viewportHeight, updateMetrics]);
 
   const maxScroll = Math.max(0, metrics.scrollHeight - metrics.clientHeight);
+  const showScrollbar = hasMultiplePages && maxScroll > 2;
   const trackHeight = metrics.clientHeight;
-  const thumbHeight = maxScroll > 0 ? THUMB_HEIGHT : 0;
+  const thumbHeight = showScrollbar ? THUMB_HEIGHT : 0;
   const maxThumbTravel = Math.max(0, trackHeight - thumbHeight);
-  const thumbTop = maxScroll > 0 ? (metrics.scrollTop / maxScroll) * maxThumbTravel : 0;
+  const thumbTop = showScrollbar ? (metrics.scrollTop / maxScroll) * maxThumbTravel : 0;
 
   const scrollByThumbDelta = useCallback((deltaY) => {
     const element = scrollRef.current;
@@ -191,7 +203,9 @@ export default function PdfViewer({ title, pdfSrc, zIndex, containerRef, onClose
       containerRef={containerRef}
       windowStyle={{ width: windowWidth }}
       recenterKey={`${viewportHeight}-${windowWidth}-${pages.length}`}
+      stackOffset={stackOffset}
       onClose={onClose}
+      onFocus={onFocus}
     >
       <div className="pdf-viewer">
         <div
@@ -201,7 +215,7 @@ export default function PdfViewer({ title, pdfSrc, zIndex, containerRef, onClose
         >
           <div
             ref={scrollRef}
-            className="pdf-viewer__scroll"
+            className={`pdf-viewer__scroll${hasMultiplePages ? '' : ' pdf-viewer__scroll--locked'}`}
             style={{ height: viewportHeight }}
           >
             <div className="pdf-viewer__pages">
@@ -222,20 +236,20 @@ export default function PdfViewer({ title, pdfSrc, zIndex, containerRef, onClose
             </div>
           </div>
 
-          <div
-            className="pdf-viewer__track"
-            onClick={handleTrackClick}
-            role="presentation"
-          >
-            {thumbHeight > 0 && (
+          {showScrollbar && (
+            <div
+              className="pdf-viewer__track"
+              onClick={handleTrackClick}
+              role="presentation"
+            >
               <div
                 className="pdf-viewer__thumb"
                 style={{ height: thumbHeight, transform: `translateY(${thumbTop}px)` }}
                 onMouseDown={handleThumbMouseDown}
                 role="presentation"
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </Window>

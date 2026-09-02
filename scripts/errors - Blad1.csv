@@ -1,0 +1,14 @@
+ID,Trigger type,Trigger,Titel,Tekst,Weergave
+TIME_03,Tijd,Na 3 minuten,TIME WELL SPENT,You have spent 3 minutes here. No meaningful progress was detected.,Eenmalig per sessie
+TIME_07,Tijd,Na 7 minuten,REAL LIFE PAUSED,Your real life has been paused. Some events may continue without you.,Eenmalig per sessie
+TIME_12,Tijd,Na 10 minuten,SESSION EXTENDED,Your session has been extended automatically. Consent was assumed.,Eenmalig per sessie
+TIME_15,Tijd of handeling,Na 13 minuten,REALITY DISCONNECTED,Connection to reality has been lost. No attempt will be made to reconnect.,Eenmalig per sessie
+TIME_20,Tijd,Na 17 minuten,TIME LIMIT EXCEEDED,Recommended screen time exceeded. Recommendation successfully ignored.,Eenmalig per sessie
+TIME_30,Tijd,Na 24\ minuten,STILL ONLINE,"You are still online. At this point, it is part of your personality.",Eenmalig per sessie
+PRIVACY_FILE,Willekeurig,,PRIVACY UPDATE,Your privacy settings have been updated. Privacy is now disabled.,Eenmalig per sessie
+LOGOUT_ATTEMPT,Handeling,bij het drukken van de log-off knop,LOGOUT FAILED,Logout failed. You can never leave.,Eenmalig per sessie
+SYSTEM_ERROR,Willekeurig ,,SYSTEM NOT RESPONDING,The system is not responding. Neither are most people.,Maximaal één keer per sessie
+USER_INACTIVE,Inactiviteit,inactivity over 20 seconds,USER INACTIVE,No activity detected. Are you thinking again?,Eenmalig per sessie
+SYSTEM_UPDATE,Willekeurig,,SYSTEM UPDATE,The system has been updated. Nothing has improved.,Maximaal één keer per sessie
+INTERNET_RESTRICT,Handeling,PRESSING INTERNET ICON,RESTRICTED ACCESS,The National Censorship Agency has restricted your internet access because you are deemed a political risk.,eindeloos
+RATRACEREVOLUTION,Handeling,PRESSING RATRACEREVOLUTION ICON,UPDATE NECESSARY,VERIFICATION CODE NEEDED TO UPDATE TO POST-COVID-19 ECONOMy,eindeloos

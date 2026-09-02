@@ -1,4 +1,4 @@
-import { folderWindows } from '../data/content';
+import { folderWindows } from '../data/filesStructure';
 
 export function buildAddressPath(pathSegments) {
   if (!pathSegments.length) return 'C:/Desktop';

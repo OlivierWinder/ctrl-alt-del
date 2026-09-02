@@ -9,16 +9,29 @@
   background: #0000aa;
   color: #ffffff;
   font-family: "Courier New", Courier, monospace;
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: 22px;
+  line-height: 1.45;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: 48px 56px;
+  padding: 40px 48px;
+  cursor: default;
+  overflow: auto;
+}
+
+.recovery-screen--centered {
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: default;
+}
+
+.recovery-screen--centered.recovery-screen--ready {
+  cursor: pointer;
 }
 
 .recovery-screen__content {
-  max-width: 720px;
+  max-width: 920px;
 }
 
 .recovery-screen__line {
@@ -35,33 +48,15 @@
 
 .recovery-screen__prompt {
   display: block;
-  margin-top: 0;
   font-family: inherit;
   font-size: inherit;
-  animation: recovery-fade-in 0.3s ease;
+  line-height: inherit;
+  color: #ffffff;
+  white-space: pre;
 }
 
 .recovery-screen__keys {
-  display: inline;
-  font-family: inherit;
-  font-size: inherit;
-  color: #ffffff;
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 3px;
   animation: recovery-blink 1s step-end infinite;
-}
-
-.recovery-screen__keys:hover {
-  color: #ffff00;
-  animation: none;
-}
-
-.recovery-screen__suffix {
-  color: #ffffff;
 }
 
 @keyframes recovery-blink {
@@ -92,45 +87,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: boot-fade-in 0.4s ease;
 }
 
 .boot-splash__logo {
-  width: min(90vw, 520px);
+  width: min(96vw, 1100px);
   height: auto;
   object-fit: contain;
   image-rendering: auto;
-  animation: boot-logo-pulse 2.5s ease-in-out;
+  opacity: 0;
+  animation: boot-logo-in 2.8s ease-in-out forwards;
 }
 
-@keyframes boot-fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes boot-logo-pulse {
+@keyframes boot-logo-in {
   0% {
     opacity: 0;
-    transform: scale(0.95);
   }
 
-  15% {
+  18% {
     opacity: 1;
-    transform: scale(1);
-  }
-
-  85% {
-    opacity: 1;
-    transform: scale(1);
   }
 
   100% {
     opacity: 1;
-    transform: scale(1);
   }
 }

@@ -3,8 +3,7 @@ import RecoveryScreen from './RecoveryScreen';
 import BootSplash from './BootSplash';
 import Desktop from './Desktop';
 
-// Set to true when you're ready to enable the boot sequence again
-const BOOT_SEQUENCE_ENABLED = false;
+const BOOT_SEQUENCE_ENABLED = true;
 
 export default function BootSequence() {
   const [phase, setPhase] = useState('recovery');

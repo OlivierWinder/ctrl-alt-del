@@ -1,0 +1,292 @@
+/* ================================================= */
+/* E-MAIL APP                                        */
+/* ================================================= */
+
+.window--email {
+    width: 680px;
+    height: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.email-app {
+    display: flex;
+    flex-direction: column;
+    background: var(--win-face);
+    border-top: 1px solid var(--win-dark);
+}
+
+.email-app__list-pane {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    margin: 4px;
+    background: var(--win-face);
+    box-sizing: border-box;
+}
+
+.email-app__list-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 110px;
+    flex-shrink: 0;
+    background: var(--win-face);
+}
+
+.email-app__list-header > div {
+    padding: 3px 6px;
+    font-size: 12px;
+    line-height: 1.2;
+    background: var(--win-face);
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.email-app__list {
+    flex: 0 0 auto;
+    overflow: hidden;
+    background: #ffffff;
+    border: 2px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+    box-sizing: border-box;
+}
+
+.email-app__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 110px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: #ffffff;
+    text-align: left;
+    cursor: pointer;
+    color: #000;
+    font: inherit;
+    font-size: 12px;
+    line-height: 1.25;
+}
+
+.email-app__row:hover {
+    background: #e8e4dc;
+}
+
+.email-app__row--active,
+.email-app__row--active:hover {
+    background: #000080;
+    color: #ffffff;
+}
+
+.email-app__row .email-app__col-from,
+.email-app__row .email-app__col-received {
+    padding: 4px 6px;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.email-app__row-from {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.email-app__row-subject {
+    font-weight: bold;
+}
+
+.email-app__row-preview {
+    display: block;
+    margin-top: 2px;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.email-app__col-received {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.email-app__splitter {
+    flex-shrink: 0;
+    height: 6px;
+    margin: 0 4px;
+    background: var(--win-face);
+    border-top: 2px solid var(--win-light);
+    border-bottom: 2px solid var(--win-dark);
+    box-sizing: border-box;
+    cursor: default;
+}
+
+.email-app__preview {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0 4px 4px;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+.email-app__meta {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--win-face);
+    border: 2px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.email-app__meta-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.email-app__reply {
+    min-width: 72px;
+    height: 24px;
+    padding: 0 12px;
+    font: inherit;
+    font-size: 12px;
+    background: var(--win-face);
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    cursor: pointer;
+}
+
+.email-app__reply:active {
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.email-app__body {
+    flex: 0 0 auto;
+    height: calc(var(--email-body-lines, 8) * 1.45em + 20px);
+    padding: 10px 12px;
+    overflow: auto;
+    background: #ffffff;
+    border: 2px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+    font-size: 13px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: normal;
+    box-sizing: border-box;
+}
+
+.email-app__link {
+    color: #0000ee;
+    text-decoration: underline;
+}
+
+.email-app__row--active .email-app__link {
+    color: #99ccff;
+}
+
+.email-app__empty {
+    margin: 0;
+    font-size: 13px;
+    color: #404040;
+}
+
+/* Reply compose */
+
+.window--email-reply {
+    width: 480px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.email-reply {
+    padding: 8px;
+    background: var(--win-face);
+    border-top: 1px solid var(--win-dark);
+    box-sizing: border-box;
+}
+
+.email-reply__box {
+    display: flex;
+    flex-direction: column;
+    min-height: 360px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 2px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+    box-sizing: border-box;
+    color: #000;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.email-reply__header {
+    flex-shrink: 0;
+    color: #000;
+}
+
+.email-reply__rule {
+    flex-shrink: 0;
+    margin: 10px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #000;
+    line-height: 1;
+    user-select: none;
+}
+
+.email-reply__input {
+    flex: 1;
+    min-height: 200px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+    color: #000;
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.45;
+    box-sizing: border-box;
+}
+
+.email-reply__footer {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.email-reply__words {
+    font-size: 11px;
+    color: #404040;
+}
+
+.email-reply__send {
+    min-width: 72px;
+    height: 24px;
+    padding: 0 12px;
+    font: inherit;
+    font-size: 12px;
+    color: #000;
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    cursor: pointer;
+}
+
+.email-reply__send:active {
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}

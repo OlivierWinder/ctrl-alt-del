@@ -1,32 +1,143 @@
+import { useEffect, useRef, useState } from 'react';
 import { useClock } from '../hooks/useClock';
 import { getWindowMeta } from '../utils/getWindowMeta';
+import { assetUrl } from '../utils/assetUrl';
 
-export default function Taskbar({ openWindowId, isMinimized, onTaskbarClick }) {
+const PLACEHOLDER_ITEMS = [
+  { id: 'programs', label: 'Programs', hasSubmenu: true },
+  { id: 'favorites', label: 'Favorites', hasSubmenu: true },
+  { id: 'documents', label: 'Documents', hasSubmenu: true },
+  { id: 'settings', label: 'Settings', hasSubmenu: true },
+  { id: 'find', label: 'Find', hasSubmenu: true },
+  { id: 'help', label: 'Help', hasSubmenu: false },
+  { id: 'run', label: 'Run...', hasSubmenu: false },
+];
+
+export default function Taskbar({ windows, focusedId, onTaskbarClick, onLogOff }) {
   const time = useClock();
-  const windowMeta = getWindowMeta(openWindowId);
+  const [isStartOpen, setIsStartOpen] = useState(false);
+  const startAreaRef = useRef(null);
+
+  useEffect(() => {
+    if (!isStartOpen) return undefined;
+
+    function handlePointerDown(event) {
+      if (!startAreaRef.current?.contains(event.target)) {
+        setIsStartOpen(false);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') setIsStartOpen(false);
+    }
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isStartOpen]);
 
   return (
     <footer className="footer">
-      <button type="button" className="footer__start_btn">
-        <img src="/RESOURCES/windows_icon.png" alt="" className="footer__start_btn__img" />
-        Start
-      </button>
+      <div className="footer__start-area" ref={startAreaRef}>
+        <button
+          type="button"
+          className={`footer__start_btn${isStartOpen ? ' footer__start_btn--active' : ''}`}
+          aria-expanded={isStartOpen}
+          aria-haspopup="menu"
+          onClick={() => setIsStartOpen((open) => !open)}
+        >
+          <img src={assetUrl('/RESOURCES/windows_icon.png')} alt="" className="footer__start_btn__img" />
+          Start
+        </button>
+
+        {isStartOpen && (
+          <div className="start-menu" role="menu">
+            <div className="start-menu__sidebar" aria-hidden="true" />
+
+            <div className="start-menu__list">
+              {PLACEHOLDER_ITEMS.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className="start-menu__item start-menu__item--placeholder"
+                  role="menuitem"
+                  disabled
+                >
+                  <img
+                    src={assetUrl('/RESOURCES/folder.png')}
+                    alt=""
+                    className="start-menu__item-icon"
+                  />
+                  <span className="start-menu__item-label">{item.label}</span>
+                  {item.hasSubmenu && (
+                    <span className="start-menu__item-arrow" aria-hidden="true" />
+                  )}
+                </button>
+              ))}
+
+              <div className="start-menu__separator" role="separator" />
+
+              <button
+                type="button"
+                className="start-menu__item"
+                role="menuitem"
+                onClick={() => {
+                  setIsStartOpen(false);
+                  onLogOff?.();
+                }}
+              >
+                <img
+                  src={assetUrl('/RESOURCES/log_off.png')}
+                  alt=""
+                  className="start-menu__item-icon"
+                />
+                <span className="start-menu__item-label">Log Off...</span>
+              </button>
+
+              <button
+                type="button"
+                className="start-menu__item"
+                role="menuitem"
+                onClick={() => setIsStartOpen(false)}
+              >
+                <img
+                  src={assetUrl('/RESOURCES/shut_down.png')}
+                  alt=""
+                  className="start-menu__item-icon"
+                />
+                <span className="start-menu__item-label">Shut Down...</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="footer__items">
-        {windowMeta && (
-          <button
-            type="button"
-            className={`footer__app-btn${!isMinimized ? ' footer__app-btn--active' : ''}`}
-            onClick={onTaskbarClick}
-          >
-            <img
-              src={windowMeta.icon}
-              alt=""
-              className="footer__app-btn__icon"
-            />
-            <span className="footer__app-btn__label">{windowMeta.title}</span>
-          </button>
-        )}
+        {windows.map((win) => {
+          const windowMeta = getWindowMeta(win);
+          const isActive = focusedId === win.instanceId && !win.minimized;
+
+          return (
+            <button
+              key={win.instanceId}
+              type="button"
+              className={`footer__app-btn${isActive ? ' footer__app-btn--active' : ''}`}
+              onClick={() => onTaskbarClick(win.instanceId)}
+              title={windowMeta.title}
+            >
+              <img
+                src={assetUrl(windowMeta.icon)}
+                alt=""
+                className="footer__app-btn__icon"
+              />
+              <span className="footer__app-btn__label">{windowMeta.title}</span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="footer__clock">{time}</div>
