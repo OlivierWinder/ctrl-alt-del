@@ -2,34 +2,49 @@
 // Regenerate: node scripts/build-files-structure.mjs
 
 export const folderWindows = {
-  images_random: {
-    title: 'RANDOM',
-    address: 'RANDOM',
+  bird_s_eye_view_the_message: {
+    title: 'THE MESSAGE',
+    address: 'THE MESSAGE',
     items: [
       {
-        label: 'sometimes.jpg',
+        label: 'TRWNBT.gif',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/sometimes.jpg'
+        image: '/RESOURCES/files/TRWNBT.gif'
       },
       {
-        label: 'tiger love.jpg',
+        label: '!!!.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/tiger%20love.jpeg'
+        image: '/RESOURCES/files/!!!.jpg'
       },
       {
-        label: 'patrick star hoverboard.jpg',
+        label: 'personality.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/patrick%20star%20hoverboard.jpeg'
+        image: '/RESOURCES/files/personality.jpg'
       },
       {
-        label: 'grandma sale.jpg',
+        label: 'Kill the machine.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/grandma%20sale.jpg'
+        image: '/RESOURCES/files/Kill%20the%20machine.jpg'
       },
       {
-        label: 'time to lock in.jpg',
+        label: 'b59e3bcb625a238b7e3356b32e8b1850.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/time%20to%20lock%20in.jpg'
+        image: '/RESOURCES/files/b59e3bcb625a238b7e3356b32e8b1850.jpg'
+      },
+      {
+        label: '8fc9b70c1c6e53164473ad9e465f623c.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/8fc9b70c1c6e53164473ad9e465f623c.jpg'
+      },
+      {
+        label: 'imagination.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/imagination.jpg'
+      },
+      {
+        label: 'never too late.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/never%20too%20late.jpg'
       },
       {
         label: 'truth.jpg',
@@ -38,14 +53,49 @@ export const folderWindows = {
       }
     ]
   },
-  images: {
-    title: 'Images',
-    address: 'Images',
+  bird_s_eye_view: {
+    title: 'Bird’s Eye View',
+    address: 'Bird’s Eye View',
     items: [
       {
-        label: 'coverart_ver2.jpg',
+        label: 'friday night.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/coverart_ver2.jpeg'
+        image: '/RESOURCES/files/friday%20night.jpg'
+      },
+      {
+        label: 'cross.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/cross.jpg'
+      },
+      {
+        label: 'yuh.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/yuh.jpg'
+      },
+      {
+        label: 'errgh.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/errgh.jpg'
+      },
+      {
+        label: 'might fuck around.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/might%20fuck%20around.jpg'
+      },
+      {
+        label: 'Maria.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/Maria.jpg'
+      },
+      {
+        label: 'full of life.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/full%20of%20life.jpg'
+      },
+      {
+        label: 'thanks god.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/thanks%20god.jpg'
       },
       {
         label: 'coverart_ver3.jpg',
@@ -53,24 +103,9 @@ export const folderWindows = {
         image: '/RESOURCES/files/coverart_ver3.jpeg'
       },
       {
-        label: 'coverart_ver4.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/coverart_ver4.jpeg'
-      },
-      {
-        label: 'coverart_ver5.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/coverart_ver5.jpeg'
-      },
-      {
-        label: 'coverart_ver6s.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/coverart_ver6.jpeg'
-      },
-      {
-        label: 'RANDOM',
+        label: 'THE MESSAGE',
         icon: '/RESOURCES/folder.png',
-        opens: 'images_random'
+        opens: 'bird_s_eye_view_the_message'
       },
       {
         label: 'Music_and_Protest.pdf',
@@ -78,9 +113,9 @@ export const folderWindows = {
         pdf: '/RESOURCES/files/Music_and_Protest.pdf'
       },
       {
-        label: 'aa59b6bd5b8f83bb39a0211d6c1c65cb.jpg',
+        label: 'tiger love.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/aa59b6bd5b8f83bb39a0211d6c1c65cb.jpeg'
+        image: '/RESOURCES/files/tiger%20love.jpeg'
       },
       {
         label: '3 act structure.png',
@@ -98,9 +133,9 @@ export const folderWindows = {
         image: '/RESOURCES/files/bring%20back%20god.jpg'
       },
       {
-        label: 'cd.jpg',
+        label: 'sometimes.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/cd.jpeg'
+        image: '/RESOURCES/files/sometimes.jpg'
       },
       {
         label: 'cd 2.jpg',
@@ -118,9 +153,59 @@ export const folderWindows = {
         image: '/RESOURCES/files/gay%20ok.jpg'
       },
       {
-        label: 'question.jpg',
+        label: 'RIP David Dees.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/question.jpg'
+        image: '/RESOURCES/files/RIP%20David%20Dees.jpg'
+      },
+      {
+        label: 'patrick star hoverboard.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/patrick%20star%20hoverboard.jpeg'
+      },
+      {
+        label: 'sweet baby jesus.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/sweet%20baby%20jesus.jpg'
+      },
+      {
+        label: 'birth.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/birth.jpg'
+      },
+      {
+        label: 'wake up.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/wake%20up.jpg'
+      },
+      {
+        label: 'PLS.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/PLS.jpg'
+      },
+      {
+        label: 'sigh.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/sigh.jpg'
+      },
+      {
+        label: 'trinity.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/trinity.jpg'
+      },
+      {
+        label: 'thank you.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/thank%20you.jpg'
+      },
+      {
+        label: 'see no.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/see%20no.jpg'
+      },
+      {
+        label: 'time to lock in.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/time%20to%20lock%20in.jpg'
       },
       {
         label: 'run.jpg',
@@ -149,9 +234,9 @@ export const folderWindows = {
       }
     ]
   },
-  music_ep_demos: {
-    title: 'EP_DEMOS',
-    address: 'EP_DEMOS',
+  demos_ep: {
+    title: 'EP',
+    address: 'EP',
     items: [
       {
         label: 'mantra.wav',
@@ -185,12 +270,6 @@ export const folderWindows = {
         opens: 'cd_player'
       },
       {
-        label: 'skit 3.wav',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/skit%203.wav',
-        opens: 'cd_player'
-      },
-      {
         label: '5-1.wav',
         icon: '/RESOURCES/cd_audio.png',
         audio: '/RESOURCES/files/5-1.wav',
@@ -204,16 +283,10 @@ export const folderWindows = {
       }
     ]
   },
-  music: {
-    title: 'Music',
-    address: 'Music',
+  demos: {
+    title: 'DEMOS',
+    address: 'DEMOS',
     items: [
-      {
-        label: 'binary-code-interface-sound-effects-sci-fi-computer-ui-sounds-209403.mp3',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/binary-code-interface-sound-effects-sci-fi-computer-ui-sounds-209403.mp3',
-        opens: 'cd_player'
-      },
       {
         label: 'lessen ambient 2.00.mp3',
         icon: '/RESOURCES/cd_audio.png',
@@ -221,21 +294,9 @@ export const folderWindows = {
         opens: 'cd_player'
       },
       {
-        label: '023727_crowded-bar-70531.mp3',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/023727_crowded-bar-70531.mp3',
-        opens: 'cd_player'
-      },
-      {
-        label: 'EP_DEMOS',
+        label: 'EP',
         icon: '/RESOURCES/folder.png',
-        opens: 'music_ep_demos'
-      },
-      {
-        label: '[fadr.com] Vocals - Brent Faiyaz - REHAB (WINTER IN PARIS) [Official Audio] - 72bpm - Amin.mp3',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/%5Bfadr.com%5D%20Vocals%20-%20Brent%20Faiyaz%20-%20REHAB%20(WINTER%20IN%20PARIS)%20%5BOfficial%20Audio%5D%20-%2072bpm%20-%20Amin.mp3',
-        opens: 'cd_player'
+        opens: 'demos_ep'
       },
       {
         label: 'LVL UP v2.mp3',
@@ -279,7 +340,8 @@ export const folderWindows = {
       },
       {
         label: 'Literature_Review_OlivierWinder_AW_V2.pdf',
-        icon: '/RESOURCES/folder.png'
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/Literature_Review_OlivierWinder_AW_V2.pdf'
       },
       {
         label: 'LILĒ.pdf',
@@ -334,11 +396,13 @@ export const folderWindows = {
       },
       {
         label: 'RatRaceRevolution.dmg',
-        icon: '/RESOURCES/folder.png'
+        icon: '/RESOURCES/folder.png',
+        errorAction: 'rat_race_revolution'
       },
       {
         label: 'Literature_Review_OlivierWinder_AW_V2.pdf',
-        icon: '/RESOURCES/folder.png'
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/Literature_Review_OlivierWinder_AW_V2.pdf'
       },
       {
         label: 'LILĒ.pdf',
@@ -409,14 +473,14 @@ export const folderWindows = {
     address: 'Files',
     items: [
       {
-        label: 'Images',
+        label: 'Bird’s Eye View',
         icon: '/RESOURCES/folder.png',
-        opens: 'images'
+        opens: 'bird_s_eye_view'
       },
       {
-        label: 'Music',
+        label: 'DEMOS',
         icon: '/RESOURCES/folder.png',
-        opens: 'music'
+        opens: 'demos'
       },
       {
         label: 'Documents',

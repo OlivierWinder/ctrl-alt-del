@@ -1,24 +1,30 @@
 import { useState } from 'react';
-import RecoveryScreen from './RecoveryScreen';
-import BootSplash from './BootSplash';
+import BootStartScreen from './BootStartScreen';
+import BootBlackout from './BootBlackout';
 import Desktop from './Desktop';
 
 const BOOT_SEQUENCE_ENABLED = true;
 
 export default function BootSequence() {
-  const [phase, setPhase] = useState('recovery');
+  const [phase, setPhase] = useState('start'); // start | blackout | desktop
 
   if (!BOOT_SEQUENCE_ENABLED) {
     return <Desktop />;
   }
 
-  if (phase === 'recovery') {
-    return <RecoveryScreen onContinue={() => setPhase('boot')} />;
-  }
+  return (
+    <>
+      <div className={phase === 'desktop' ? 'boot-desktop' : 'boot-preload'}>
+        <Desktop />
+      </div>
 
-  if (phase === 'boot') {
-    return <BootSplash onComplete={() => setPhase('desktop')} />;
-  }
+      {phase === 'start' && (
+        <BootStartScreen onContinue={() => setPhase('blackout')} />
+      )}
 
-  return <Desktop />;
+      {phase === 'blackout' && (
+        <BootBlackout onComplete={() => setPhase('desktop')} />
+      )}
+    </>
+  );
 }

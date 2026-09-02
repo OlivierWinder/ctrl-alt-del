@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
+import { readdirSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -18,6 +18,8 @@ const AUDIO_EXTENSIONS = /\.(mp3|wav)$/i;
 const FILE_ALIASES = {
   'coverart_ver2.jpg': 'coverart_ver2.jpeg',
   'coverart_ver3.jpg': 'coverart_ver3.jpeg',
+  'tiger love.jpg': 'tiger love.jpeg',
+  'patrick star hoverboard.jpg': 'patrick star hoverboard.jpeg',
   'coverart_ver4.jpg': 'coverart_ver4.jpeg',
   'coverart_ver5.jpg': 'coverart_ver5.jpeg',
   'coverart_ver6s.jpg': 'coverart_ver6.jpeg',
@@ -86,6 +88,13 @@ function publicPath(diskName) {
 
 function makeFileItem(label, diskIndex, { isFirstEpDemo = false } = {}) {
   const item = { label, icon: FOLDER_ICON };
+
+  // Fake installer — opens the rat race error dialog, no real file needed
+  if (normalizeKey(label) === 'ratracerevolution.dmg') {
+    item.errorAction = 'rat_race_revolution';
+    return item;
+  }
+
   const diskName = resolveDiskName(label, diskIndex);
 
   if (!diskName) return item;
@@ -229,7 +238,7 @@ function buildFolderWindows(topLevelFolders, diskIndex) {
       const item = makeFileItem(label, diskIndex, {
         isFirstEpDemo: Boolean(options.epDemos && index === 0),
       });
-      if (!item.pdf && !item.image && !item.audio) missing.push(label);
+      if (!item.pdf && !item.image && !item.audio && !item.errorAction) missing.push(label);
       return item;
     });
   }
@@ -252,7 +261,7 @@ function buildFolderWindows(topLevelFolders, diskIndex) {
       folderWindows[subId] = {
         title: subName,
         address: subName,
-        items: fileItems(subFiles, { epDemos: subName === 'EP_DEMOS' }),
+        items: fileItems(subFiles, { epDemos: subName === 'EP' }),
       };
       topItems.push(makeFolderItem(subName, subId));
     }
@@ -273,9 +282,42 @@ function buildFolderWindows(topLevelFolders, diskIndex) {
   return { folderWindows, missing };
 }
 
-const diskIndex = buildDiskIndex();
+function collectLabels(topLevelFolders) {
+  const labels = new Set();
+
+  for (const bucket of topLevelFolders.values()) {
+    for (const label of bucket.files) labels.add(label);
+    for (const subFiles of bucket.subfolders.values()) {
+      for (const label of subFiles) labels.add(label);
+    }
+  }
+
+  return labels;
+}
+
+function cleanupOrphans(topLevelFolders, diskIndex) {
+  const keep = new Set();
+
+  for (const label of collectLabels(topLevelFolders)) {
+    const diskName = resolveDiskName(label, diskIndex);
+    if (diskName) keep.add(normalizeKey(diskName));
+  }
+
+  for (const name of readdirSync(FILES_DIR)) {
+    if (name.startsWith('.')) continue;
+    if (!keep.has(normalizeKey(name))) {
+      unlinkSync(join(FILES_DIR, name));
+      console.log('Removed orphan:', name);
+    }
+  }
+}
+
 const csv = readFileSync(CSV_PATH, 'utf8');
-const { folderWindows, missing } = buildFolderWindows(parseCsv(csv), diskIndex);
+const topLevelFolders = parseCsv(csv);
+let diskIndex = buildDiskIndex();
+cleanupOrphans(topLevelFolders, diskIndex);
+diskIndex = buildDiskIndex();
+const { folderWindows, missing } = buildFolderWindows(topLevelFolders, diskIndex);
 
 const output = `// Auto-generated from FILES - Blad1.csv — do not edit by hand.
 // Regenerate: node scripts/build-files-structure.mjs

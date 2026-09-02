@@ -86,7 +86,7 @@ export default function Desktop() {
     }
 
     if (id === 'listen') {
-      navigateFolder('music_ep_demos', ['FILES', 'Music', 'EP_DEMOS']);
+      navigateFolder('demos_ep', ['FILES', 'DEMOS', 'EP']);
       return;
     }
 
@@ -99,6 +99,11 @@ export default function Desktop() {
   }
 
   function handleOpenFolderItem(item, folderInstanceId) {
+    if (item.errorAction) {
+      triggerErrorAction(openErrorDialog, item.errorAction);
+      return;
+    }
+
     if (item.pdf) {
       openPdfView(item.label, item.pdf);
       return;
