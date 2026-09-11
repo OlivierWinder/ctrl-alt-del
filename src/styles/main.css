@@ -414,7 +414,7 @@ body {
     /* full viewport width */
     height: 100vh;
     /* full viewport height */
-    z-index: 9999;
+    z-index: 100000;
     /* above all other windows */
     object-fit: cover;
     /* scale video to cover full screen */
@@ -694,8 +694,8 @@ body {
     top: 50%;
     transform: translate(-50%, -50%);
     margin: 0;
-    padding: 0;
-    background: transparent;
+    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.45);
     border: none;
     color: #c8e800;
     font-family: "Courier New", Courier, monospace !important;

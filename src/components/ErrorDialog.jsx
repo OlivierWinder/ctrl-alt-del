@@ -6,6 +6,7 @@ export default function ErrorDialog({
   message,
   actions,
   icon = '/RESOURCES/msg_warning.png',
+  layout = null,
   zIndex,
   containerRef,
   stackOffset = 0,
@@ -13,6 +14,7 @@ export default function ErrorDialog({
   onFocus,
   onAction,
 }) {
+  const isIconOnly = layout === 'icon';
   const buttons = actions?.length
     ? actions
     : [{ id: 'ok', label: 'Ok' }];
@@ -27,37 +29,54 @@ export default function ErrorDialog({
 
   return (
     <Window
-      title={title}
+      title={title || (isIconOnly ? ' ' : 'System Error')}
       variant="error"
       zIndex={zIndex}
       containerRef={containerRef}
       stackOffset={stackOffset}
+      placement="random"
+      windowStyle={isIconOnly ? { width: '120px' } : undefined}
       onClose={onClose}
       onFocus={onFocus}
     >
-      <div className="error-dialog">
-        <div className="error-dialog__body">
+      {isIconOnly ? (
+        <button
+          type="button"
+          className="error-dialog error-dialog--icon"
+          onClick={onClose}
+          aria-label="Close"
+        >
           <img
             src={assetUrl(icon || '/RESOURCES/msg_warning.png')}
             alt=""
-            className="error-dialog__icon"
+            className="error-dialog__icon error-dialog__icon--solo"
           />
-          <p className="error-dialog__message">{message}</p>
-        </div>
+        </button>
+      ) : (
+        <div className="error-dialog">
+          <div className="error-dialog__body">
+            <img
+              src={assetUrl(icon || '/RESOURCES/msg_warning.png')}
+              alt=""
+              className="error-dialog__icon"
+            />
+            <p className="error-dialog__message">{message}</p>
+          </div>
 
-        <div className="error-dialog__actions">
-          {buttons.map((action) => (
-            <button
-              key={action.id}
-              type="button"
-              className="error-dialog__cancel"
-              onClick={() => handleAction(action.id)}
-            >
-              {action.label}
-            </button>
-          ))}
+          <div className="error-dialog__actions">
+            {buttons.map((action) => (
+              <button
+                key={action.id}
+                type="button"
+                className="error-dialog__cancel"
+                onClick={() => handleAction(action.id)}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </Window>
   );
 }

@@ -243,43 +243,50 @@ export const folderWindows = {
         icon: '/RESOURCES/cd_audio.png',
         audio: '/RESOURCES/files/mantra.wav',
         opens: 'cd_player',
+        cover: '/RESOURCES/ep_cover.jpg',
         autoplay: true
       },
       {
         label: 'a tryer is a winner.wav',
         icon: '/RESOURCES/cd_audio.png',
         audio: '/RESOURCES/files/a%20tryer%20is%20a%20winner.wav',
-        opens: 'cd_player'
+        opens: 'cd_player',
+        cover: '/RESOURCES/ep_cover.jpg'
       },
       {
         label: 'skit 1.wav',
         icon: '/RESOURCES/cd_audio.png',
         audio: '/RESOURCES/files/skit%201.wav',
-        opens: 'cd_player'
+        opens: 'cd_player',
+        cover: '/RESOURCES/ep_cover.jpg'
       },
       {
         label: 'no hate.wav',
         icon: '/RESOURCES/cd_audio.png',
         audio: '/RESOURCES/files/no%20hate.wav',
-        opens: 'cd_player'
+        opens: 'cd_player',
+        cover: '/RESOURCES/ep_cover.jpg'
       },
       {
         label: 'gimme a mf break.wav',
         icon: '/RESOURCES/cd_audio.png',
         audio: '/RESOURCES/files/gimme%20a%20mf%20break.wav',
-        opens: 'cd_player'
+        opens: 'cd_player',
+        cover: '/RESOURCES/ep_cover.jpg'
       },
       {
         label: '5-1.wav',
         icon: '/RESOURCES/cd_audio.png',
         audio: '/RESOURCES/files/5-1.wav',
-        opens: 'cd_player'
+        opens: 'cd_player',
+        cover: '/RESOURCES/ep_cover.jpg'
       },
       {
         label: 'slowly.wav',
         icon: '/RESOURCES/cd_audio.png',
         audio: '/RESOURCES/files/slowly.wav',
-        opens: 'cd_player'
+        opens: 'cd_player',
+        cover: '/RESOURCES/ep_cover.jpg'
       }
     ]
   },

@@ -9,6 +9,7 @@ export default function Window({
   windowStyle,
   recenterKey,
   stackOffset = 0,
+  placement = 'center',
   onClose,
   onFocus,
   children,
@@ -19,6 +20,7 @@ export default function Window({
     windowRef,
     recenterKey,
     stackOffset,
+    placement,
   );
 
   const className = [

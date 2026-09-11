@@ -13,34 +13,62 @@ function getCenteredPosition(container, windowEl, stackOffset = 0) {
   };
 }
 
-export function useWindowDrag(containerRef, windowRef, recenterKey, stackOffset = 0) {
+function getRandomPosition(container, windowEl) {
+  const winWidth = windowEl.offsetWidth;
+  const winHeight = windowEl.offsetHeight;
+  const maxX = Math.max(0, container.clientWidth - winWidth);
+  const maxY = Math.max(0, container.clientHeight - TASKBAR_HEIGHT - winHeight);
+
+  return {
+    x: Math.floor(Math.random() * (maxX + 1)),
+    y: Math.floor(Math.random() * (maxY + 1)),
+  };
+}
+
+export function useWindowDrag(
+  containerRef,
+  windowRef,
+  recenterKey,
+  stackOffset = 0,
+  placement = 'center',
+) {
   const [position, setPosition] = useState(null);
   const isDragging = useRef(false);
   const hasBeenDragged = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
+  const randomSeeded = useRef(false);
 
-  const centerWindow = useCallback(() => {
+  const placeWindow = useCallback(() => {
     if (!windowRef.current || !containerRef.current || hasBeenDragged.current) return;
+
+    if (placement === 'random') {
+      if (randomSeeded.current) return;
+      randomSeeded.current = true;
+      setPosition(getRandomPosition(containerRef.current, windowRef.current));
+      return;
+    }
+
     setPosition(getCenteredPosition(containerRef.current, windowRef.current, stackOffset));
-  }, [containerRef, windowRef, stackOffset]);
+  }, [containerRef, windowRef, stackOffset, placement]);
 
   useLayoutEffect(() => {
     hasBeenDragged.current = false;
-    centerWindow();
-  }, [centerWindow, recenterKey]);
+    randomSeeded.current = false;
+    placeWindow();
+  }, [placeWindow, recenterKey]);
 
   useEffect(() => {
     const win = windowRef.current;
     if (!win) return undefined;
 
     const resizeObserver = new ResizeObserver(() => {
-      centerWindow();
+      placeWindow();
     });
 
     resizeObserver.observe(win);
 
     return () => resizeObserver.disconnect();
-  }, [centerWindow, recenterKey]);
+  }, [placeWindow, recenterKey, placement]);
 
   const onTitleBarMouseDown = useCallback((event) => {
     if (event.target.closest('.title_bar__button')) return;

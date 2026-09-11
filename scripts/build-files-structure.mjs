@@ -9,6 +9,7 @@ const OUTPUT_PATH = join(__dirname, '../src/data/filesStructure.js');
 
 const FOLDER_ICON = '/RESOURCES/folder.png';
 const CD_AUDIO_ICON = '/RESOURCES/cd_audio.png';
+const EP_COVER_ICON = '/RESOURCES/ep_cover.jpg';
 const IMAGE_FILE_ICON = '/RESOURCES/image_file.png';
 const FILE_EXTENSIONS = /\.(jpe?g|png|pdf|mp3|dmg|wav|gif|txt|doc|mp4|mov)$/i;
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|gif|webp)$/i;
@@ -86,7 +87,7 @@ function publicPath(diskName) {
   return `/RESOURCES/files/${encodeURIComponent(diskName).replace(/%2F/gi, '/')}`;
 }
 
-function makeFileItem(label, diskIndex, { isFirstEpDemo = false } = {}) {
+function makeFileItem(label, diskIndex, { isFirstEpDemo = false, useEpCover = false } = {}) {
   const item = { label, icon: FOLDER_ICON };
 
   // Fake installer — opens the rat race error dialog, no real file needed
@@ -111,6 +112,7 @@ function makeFileItem(label, diskIndex, { isFirstEpDemo = false } = {}) {
     item.icon = CD_AUDIO_ICON;
     item.audio = path;
     item.opens = 'cd_player';
+    if (useEpCover) item.cover = EP_COVER_ICON;
     if (isFirstEpDemo) item.autoplay = true;
   }
 
@@ -237,6 +239,7 @@ function buildFolderWindows(topLevelFolders, diskIndex) {
     return labels.map((label, index) => {
       const item = makeFileItem(label, diskIndex, {
         isFirstEpDemo: Boolean(options.epDemos && index === 0),
+        useEpCover: Boolean(options.epDemos),
       });
       if (!item.pdf && !item.image && !item.audio && !item.errorAction) missing.push(label);
       return item;

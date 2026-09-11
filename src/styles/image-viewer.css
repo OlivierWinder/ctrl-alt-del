@@ -33,16 +33,13 @@
     border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
 }
 
-.image-viewer--ad {
-    position: relative;
-}
-
-.ad-connection-prompt {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 5;
-    width: min(300px, calc(100% - 28px));
+/* Bottom-right ad-diction prompts (not overlaid on the ad) */
+.ad-diction-prompt {
+    position: fixed;
+    right: 18px;
+    bottom: 52px;
+    z-index: 50000;
+    width: min(320px, calc(100vw - 36px));
     box-sizing: border-box;
     background: var(--win-gray);
     border: 2px solid;
@@ -53,7 +50,7 @@
         2px 2px 0 rgba(0, 0, 0, 0.35);
 }
 
-.ad-connection-prompt__title {
+.ad-diction-prompt__title {
     height: 22px;
     padding: 0 4px 0 8px;
     background: var(--win-blue);
@@ -66,33 +63,42 @@
     font-weight: 700;
 }
 
-.ad-connection-prompt__body {
+.ad-diction-prompt--off-grid {
+    right: auto;
+    bottom: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-42%, -38%);
+    width: min(420px, calc(100vw - 36px));
+    z-index: 50100;
+}
+
+.ad-diction-prompt .error-dialog {
+    /* Same content padding/gap/buttons as system error dialogs */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.ad-diction-prompt__stats-text {
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 12px 10px 8px;
-}
-
-.ad-connection-prompt__icon {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    image-rendering: pixelated;
-    display: block;
-}
-
-.ad-connection-prompt__message {
-    margin: 0;
+    flex-direction: column;
+    gap: 12px;
     flex: 1;
     min-width: 0;
-    font-size: 13px;
+}
+
+.ad-diction-prompt__stats-text p {
+    margin: 0;
+    font-size: 14px;
     line-height: 1.35;
     text-align: left;
 }
 
-.ad-connection-prompt__actions {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    padding: 0 10px 12px;
+.ad-diction-prompt__block {
+    width: 100%;
+    min-height: 28px;
+    height: auto;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 700;
 }

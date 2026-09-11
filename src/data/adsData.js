@@ -1,4 +1,4 @@
-/** Fullscreen fake ad images — timers start only after desktop is active. */
+/** Fake ad images — timers start only after desktop is active. */
 
 export const FIRST_AD_DELAY_MS = 10 * 1000;
 export const NEXT_AD_MIN_MS = 30 * 1000;
@@ -28,17 +28,31 @@ export const fakeAds = [
   '/RESOURCES/ads/ad_21.png',
 ];
 
-export const onlineOfflinePrompt = {
-  id: 'ONLINE_OFFLINE',
-  title: 'CONNECTION STATUS',
-  message: 'Do you want to stay offline, or go online?',
-  once: true,
-  icon: '/RESOURCES/internet_connection_wiz.png',
+export const adDictionPrompt = {
+  id: 'AD_DICTION',
+  title: 'ad-diction',
+  message: 'ad detected',
+  icon: '/RESOURCES/icon_adblocker.png',
   actions: [
-    { id: 'offline', label: 'Offline' },
-    { id: 'online', label: 'Online' },
+    { id: 'more_info', label: 'more info...' },
   ],
 };
+
+export const offGridPrompt = {
+  id: 'OFF_GRID',
+  title: 'ad-diction',
+  message:
+    'IMPORTANT: Ads can not legally be blocked in this dystopian economy, but we can block your internet connection entirely. Wish to continue off the grid?',
+  icon: '/RESOURCES/icon_adblocker.png',
+  actions: [
+    { id: 'yes', label: 'Yes' },
+    { id: 'no', label: 'No' },
+  ],
+};
+
+export function randomEuroPerAd() {
+  return 50 + Math.floor(Math.random() * 51);
+}
 
 export function randomNextAdDelay() {
   return NEXT_AD_MIN_MS + Math.random() * (NEXT_AD_MAX_MS - NEXT_AD_MIN_MS);

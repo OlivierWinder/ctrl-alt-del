@@ -108,6 +108,7 @@ export const errors = [
     action: 'cd_eject',
     title: '',
     message: '',
+    layout: 'icon',
     once: false,
   },
 ];

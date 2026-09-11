@@ -1,5 +1,5 @@
 // Flip to false to show LISTEN / CD-ROM / AI again after screen recording.
-export const hideIconsForRecording = true;
+export const hideIconsForRecording = false;
 
 export const desktopIcons = [
   {
@@ -89,5 +89,5 @@ export const cdPlayerData = {
 };
 
 export const virusVideo = {
-  src: '/RESOURCES/crash.mov',
+  src: '/RESOURCES/crash.mp4',
 };

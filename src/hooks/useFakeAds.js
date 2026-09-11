@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FIRST_AD_DELAY_MS,
   fakeAds,
+  randomEuroPerAd,
   randomNextAdDelay,
 } from '../data/adsData';
 
@@ -16,17 +17,18 @@ function shuffle(list) {
 
 /**
  * Fake ads — only schedules once the desktop session is active.
- * First ad after FIRST_AD_DELAY_MS; later ads 30–60s after each dismissal
- * unless the user chooses Offline on the connection prompt.
- * The connection prompt overlays the first ad; the ad stays open until the user closes it.
+ * more info opens a centered ad-diction window (taskbar); off-grid overlays it.
  */
-export function useFakeAds({ isActive }) {
+export function useFakeAds({ isActive, openAdDictionWindow, closeAdDictionWindow }) {
   const [currentAd, setCurrentAd] = useState(null);
-  const [showConnectionPrompt, setShowConnectionPrompt] = useState(false);
+  const [showAdDiction, setShowAdDiction] = useState(false);
+  const [showOffGrid, setShowOffGrid] = useState(false);
+  const [adsShownCount, setAdsShownCount] = useState(0);
+  const [attentionEuros, setAttentionEuros] = useState(0);
   const queueRef = useRef([]);
   const timerRef = useRef(null);
   const adsEnabledRef = useRef(true);
-  const connectionPromptShownRef = useRef(false);
+  const adsShownRef = useRef(0);
   const isActiveRef = useRef(isActive);
 
   isActiveRef.current = isActive;
@@ -46,11 +48,10 @@ export function useFakeAds({ isActive }) {
   }, []);
 
   const showAd = useCallback((src) => {
+    adsShownRef.current += 1;
+    setAdsShownCount(adsShownRef.current);
     setCurrentAd(src);
-    if (!connectionPromptShownRef.current) {
-      connectionPromptShownRef.current = true;
-      setShowConnectionPrompt(true);
-    }
+    setShowAdDiction(true);
   }, []);
 
   const scheduleAd = useCallback((delayMs) => {
@@ -68,42 +69,96 @@ export function useFakeAds({ isActive }) {
     if (!isActive) {
       clearTimer();
       setCurrentAd(null);
-      setShowConnectionPrompt(false);
+      setShowAdDiction(false);
+      setShowOffGrid(false);
+      setAdsShownCount(0);
+      setAttentionEuros(0);
+      adsShownRef.current = 0;
+      closeAdDictionWindow?.();
       return undefined;
     }
 
     adsEnabledRef.current = true;
-    connectionPromptShownRef.current = false;
+    adsShownRef.current = 0;
+    setAdsShownCount(0);
+    setAttentionEuros(0);
+    setShowAdDiction(false);
+    setShowOffGrid(false);
     queueRef.current = shuffle(fakeAds);
     scheduleAd(FIRST_AD_DELAY_MS);
 
     return () => clearTimer();
-  }, [isActive, clearTimer, scheduleAd]);
+  }, [isActive, clearTimer, scheduleAd, closeAdDictionWindow]);
 
   const dismissAd = useCallback(() => {
     if (!currentAd) return;
 
     setCurrentAd(null);
-    setShowConnectionPrompt(false);
 
     if (isActiveRef.current && adsEnabledRef.current) {
       scheduleAd(randomNextAdDelay());
     }
   }, [currentAd, scheduleAd]);
 
-  const handleConnectionChoice = useCallback((choice) => {
-    setShowConnectionPrompt(false);
-
-    if (choice === 'offline') {
-      adsEnabledRef.current = false;
-      clearTimer();
-    }
+  const stopAds = useCallback(() => {
+    adsEnabledRef.current = false;
+    clearTimer();
   }, [clearTimer]);
+
+  const internetDisabledByAdBlockerRef = useRef(false);
+
+  const disableInternetViaAdBlocker = useCallback(() => {
+    internetDisabledByAdBlockerRef.current = true;
+    stopAds();
+  }, [stopAds]);
+
+  const handlePromptAction = useCallback((actionId) => {
+    if (actionId === 'more_info') {
+      const count = adsShownRef.current;
+      const euros = count * randomEuroPerAd();
+      setAttentionEuros(euros);
+      setShowAdDiction(false);
+      openAdDictionWindow?.({ adsShownCount: count, attentionEuros: euros });
+      return undefined;
+    }
+
+    if (actionId === 'block_ads') {
+      setShowOffGrid(true);
+      return undefined;
+    }
+
+    if (actionId === 'yes') {
+      setShowOffGrid(false);
+      closeAdDictionWindow?.();
+      disableInternetViaAdBlocker();
+      return { wentOffGrid: true };
+    }
+
+    if (actionId === 'no') {
+      setShowOffGrid(false);
+      return { wentOffGrid: false };
+    }
+
+    return undefined;
+  }, [openAdDictionWindow, closeAdDictionWindow, disableInternetViaAdBlocker]);
+
+  useEffect(() => {
+    if (!isActive) {
+      internetDisabledByAdBlockerRef.current = false;
+    }
+  }, [isActive]);
 
   return {
     currentAd,
     dismissAd,
-    showConnectionPrompt,
-    handleConnectionChoice,
+    showAdDiction,
+    showOffGrid,
+    adsShownCount,
+    attentionEuros,
+    setShowAdDiction,
+    setShowOffGrid,
+    handlePromptAction,
+    stopAds,
+    isInternetDisabledByAdBlocker: () => internetDisabledByAdBlockerRef.current,
   };
 }

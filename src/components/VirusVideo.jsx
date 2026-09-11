@@ -12,6 +12,27 @@ export default function VirusVideo({ isOpen, onClose }) {
     videoRef.current.play().catch(() => {});
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function stopPlayback() {
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+      onClose();
+    }
+
+    function onKeyDown(event) {
+      if (event.key === 'Escape' || event.key === ' ' || event.code === 'Space') {
+        event.preventDefault();
+        stopPlayback();
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
@@ -20,6 +41,12 @@ export default function VirusVideo({ isOpen, onClose }) {
       className="virus_video"
       autoPlay
       onEnded={onClose}
+      onClick={() => {
+        if (videoRef.current) {
+          videoRef.current.pause();
+        }
+        onClose();
+      }}
     >
       <source src={assetUrl(virusVideo.src)} type="video/mp4" />
     </video>

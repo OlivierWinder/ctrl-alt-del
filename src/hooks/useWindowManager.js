@@ -23,6 +23,7 @@ export function useWindowManager() {
     return id;
   }, []);
 
+  // Single rising stack so any focused window (apps, errors, ads) can sit on top.
   const allocZ = useCallback(() => {
     nextZRef.current += 1;
     return nextZRef.current;
@@ -30,7 +31,8 @@ export function useWindowManager() {
 
   const focusWindow = useCallback((instanceId) => {
     setWindows((current) => {
-      if (!current.some((win) => win.instanceId === instanceId)) return current;
+      const target = current.find((win) => win.instanceId === instanceId);
+      if (!target) return current;
       const zIndex = allocZ();
       return current.map((win) => (
         win.instanceId === instanceId
@@ -58,12 +60,12 @@ export function useWindowManager() {
       setWindows((current) => {
         const target = current.find((win) => win.instanceId === instanceId);
         if (!target) return current;
+        const nextZ = allocZ();
 
         if (target.minimized) {
-          const zIndex = allocZ();
           return current.map((win) => (
             win.instanceId === instanceId
-              ? { ...win, minimized: false, zIndex }
+              ? { ...win, minimized: false, zIndex: nextZ }
               : win
           ));
         }
@@ -74,10 +76,9 @@ export function useWindowManager() {
           ));
         }
 
-        const zIndex = allocZ();
         return current.map((win) => (
           win.instanceId === instanceId
-            ? { ...win, minimized: false, zIndex }
+            ? { ...win, minimized: false, zIndex: nextZ }
             : win
         ));
       });
@@ -144,6 +145,59 @@ export function useWindowManager() {
     setFocusedId(instanceId);
   }, [allocId, allocZ]);
 
+  const openAdDictionWindow = useCallback(({ adsShownCount = 0, attentionEuros = 0 } = {}) => {
+    setWindows((current) => {
+      const existing = current.find((win) => win.type === 'ad_diction');
+
+      if (existing) {
+        const zIndex = allocZ();
+        setFocusedId(existing.instanceId);
+        return current.map((win) => (
+          win.instanceId === existing.instanceId
+            ? {
+              ...win,
+              adsShownCount,
+              attentionEuros,
+              zIndex,
+              minimized: false,
+            }
+            : win
+        ));
+      }
+
+      const instanceId = allocId();
+      const zIndex = allocZ();
+      setFocusedId(instanceId);
+      return [
+        ...current,
+        {
+          instanceId,
+          type: 'ad_diction',
+          appId: 'ad_diction',
+          title: 'ad-diction',
+          adsShownCount,
+          attentionEuros,
+          zIndex,
+          stackIndex: current.length,
+          minimized: false,
+        },
+      ];
+    });
+  }, [allocId, allocZ]);
+
+  const closeAdDictionWindow = useCallback(() => {
+    setWindows((current) => {
+      const remaining = current.filter((win) => win.type !== 'ad_diction');
+      setFocusedId((focused) => {
+        const closed = current.find((win) => win.type === 'ad_diction');
+        if (!closed || focused !== closed.instanceId) return focused;
+        if (!remaining.length) return null;
+        return remaining.reduce((top, win) => (win.zIndex > top.zIndex ? win : top)).instanceId;
+      });
+      return remaining;
+    });
+  }, []);
+
   const openErrorDialog = useCallback((error) => {
     if (!error) return false;
     if (error.once && shownErrorsRef.current.has(error.id)) return false;
@@ -162,6 +216,7 @@ export function useWindowManager() {
               message: error.message,
               actions: error.actions || null,
               icon: error.icon || null,
+              layout: error.layout || null,
               zIndex,
               minimized: false,
             }
@@ -182,6 +237,7 @@ export function useWindowManager() {
           message: error.message,
           actions: error.actions || null,
           icon: error.icon || null,
+          layout: error.layout || null,
           zIndex,
           stackIndex: current.length,
           minimized: false,
@@ -362,6 +418,8 @@ export function useWindowManager() {
     openPdfView,
     openImageView,
     openAudioView,
+    openAdDictionWindow,
+    closeAdDictionWindow,
     openErrorDialog,
     navigateFolder,
     folderBack,
@@ -369,5 +427,6 @@ export function useWindowManager() {
     closeWindow,
     focusWindow,
     toggleMinimize,
+    allocateZIndex: allocZ,
   };
 }

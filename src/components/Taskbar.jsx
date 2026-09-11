@@ -109,7 +109,7 @@ export default function Taskbar({ windows, focusedId, onTaskbarClick, onLogOff }
                   alt=""
                   className="start-menu__item-icon"
                 />
-                <span className="start-menu__item-label">Shut Down...</span>
+                <span className="start-menu__item-label">Restart...</span>
               </button>
             </div>
           </div>

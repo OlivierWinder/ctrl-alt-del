@@ -43,6 +43,13 @@ export function getWindowMeta(win) {
     };
   }
 
+  if (win.type === 'ad_diction') {
+    return {
+      title: win.title || 'ad-diction',
+      icon: '/RESOURCES/icon_adblocker.png',
+    };
+  }
+
   if (win.type === 'error') {
     return {
       title: win.title || 'System Error',

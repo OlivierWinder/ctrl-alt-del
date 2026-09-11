@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import DesktopIcon from './DesktopIcon';
 import FolderWindow from './FolderWindow';
 import CDPlayer from './CDPlayer';
@@ -10,6 +10,8 @@ import EmailApp from './EmailApp';
 import SimpleWindow from './SimpleWindow';
 import VirusVideo from './VirusVideo';
 import FakeAdOverlay from './FakeAdOverlay';
+import AdDictionPrompt from './AdDictionPrompt';
+import AdDictionWindow from './AdDictionWindow';
 import Taskbar from './Taskbar';
 import { desktopIcons, folderWindows } from '../data/content';
 import { useWindowManager } from '../hooks/useWindowManager';
@@ -55,6 +57,8 @@ export default function Desktop({ isActive = true }) {
     openPdfView,
     openImageView,
     openAudioView,
+    openAdDictionWindow,
+    closeAdDictionWindow,
     openErrorDialog,
     navigateFolder,
     folderBack,
@@ -62,32 +66,57 @@ export default function Desktop({ isActive = true }) {
     closeWindow,
     focusWindow,
     toggleMinimize,
+    allocateZIndex,
   } = useWindowManager();
 
   useErrorTriggers(openErrorDialog, isActive);
   const {
     currentAd,
     dismissAd,
-    showConnectionPrompt,
-    handleConnectionChoice,
-  } = useFakeAds({ isActive });
+    showAdDiction,
+    showOffGrid,
+    setShowAdDiction,
+    setShowOffGrid,
+    handlePromptAction,
+    stopAds,
+    isInternetDisabledByAdBlocker,
+  } = useFakeAds({ isActive, openAdDictionWindow, closeAdDictionWindow });
+
+  const [adZIndex, setAdZIndex] = useState(0);
+
+  useEffect(() => {
+    if (!currentAd) {
+      setAdZIndex(0);
+      return;
+    }
+    setAdZIndex(allocateZIndex());
+  }, [currentAd, allocateZIndex]);
 
   const iconPositions = useMemo(() => getIconPositions(), []);
+
+  function openInternetRestriction() {
+    // Already shut off through ad-diction — don't show again
+    if (isInternetDisabledByAdBlocker()) return false;
+
+    stopAds();
+    return triggerErrorAction(openErrorDialog, 'internet');
+  }
 
   function handleErrorAction(win, actionId) {
     closeWindow(win.instanceId);
 
     if (actionId === 'online') {
-      triggerErrorAction(openErrorDialog, 'internet');
+      openInternetRestriction();
     }
   }
 
-  function handleAdConnectionChoice(choice) {
-    handleConnectionChoice(choice);
+  function handleAdPromptAction(actionId) {
+    handlePromptAction(actionId);
+  }
 
-    if (choice === 'online') {
-      triggerErrorAction(openErrorDialog, 'internet');
-    }
+  function handleCloseAdDictionWindow(instanceId) {
+    setShowOffGrid(false);
+    closeWindow(instanceId);
   }
 
   function handleDesktopMouseDown(event) {
@@ -104,7 +133,12 @@ export default function Desktop({ isActive = true }) {
       return;
     }
 
-    if (id === 'internet' || id === 'rat_race_revolution') {
+    if (id === 'internet') {
+      openInternetRestriction();
+      return;
+    }
+
+    if (id === 'rat_race_revolution') {
       triggerErrorAction(openErrorDialog, id);
       return;
     }
@@ -142,8 +176,9 @@ export default function Desktop({ isActive = true }) {
       openAudioView(
         {
           title: item.label.replace(/\.(mp3|wav)$/i, ''),
-          subtitle: 'a tryer is a winner',
+          artist: 'a tryer is a winner',
           audio: item.audio,
+          cover: item.cover,
         },
         { autoplay: true },
       );
@@ -272,7 +307,20 @@ export default function Desktop({ isActive = true }) {
                 message={win.message}
                 actions={win.actions}
                 icon={win.icon}
+                layout={win.layout}
                 onAction={(actionId) => handleErrorAction(win, actionId)}
+              />
+            );
+          }
+
+          if (win.type === 'ad_diction') {
+            return (
+              <AdDictionWindow
+                {...shared}
+                adsShownCount={win.adsShownCount}
+                attentionEuros={win.attentionEuros}
+                onClose={() => handleCloseAdDictionWindow(win.instanceId)}
+                onBlockAds={() => handleAdPromptAction('block_ads')}
               />
             );
           }
@@ -306,10 +354,18 @@ export default function Desktop({ isActive = true }) {
 
         <FakeAdOverlay
           src={currentAd}
+          zIndex={adZIndex}
           onClose={dismissAd}
+          onFocus={() => setAdZIndex(allocateZIndex())}
           containerRef={desktopRef}
-          showConnectionPrompt={showConnectionPrompt}
-          onConnectionChoice={handleAdConnectionChoice}
+        />
+
+        <AdDictionPrompt
+          showAdDiction={showAdDiction}
+          showOffGrid={showOffGrid}
+          onAction={handleAdPromptAction}
+          onCloseAdDiction={() => setShowAdDiction(false)}
+          onCloseOffGrid={() => setShowOffGrid(false)}
         />
       </main>
 

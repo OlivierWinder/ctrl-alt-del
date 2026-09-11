@@ -70,3 +70,22 @@
 .error-dialog__cancel:active {
     border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
 }
+
+.error-dialog--icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1;
+    margin: 0;
+    padding: 28px;
+    box-sizing: border-box;
+    background: var(--win-gray);
+    border: 0;
+    cursor: pointer;
+}
+
+.error-dialog__icon--solo {
+    width: 48px;
+    height: 48px;
+}
