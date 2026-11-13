@@ -1,0 +1,119 @@
+/* ================================================= */
+/* LISTEN — album / tracklist window                 */
+/* ================================================= */
+
+.window--listen {
+    width: min(420px, 92vw);
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.window--listen .window__title_bar {
+    background: #f2e100;
+    color: #000000;
+}
+
+.window--listen .title_bar__button {
+    color: #000000;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    background: var(--win-gray);
+}
+
+.listen-window {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px;
+    background: var(--win-gray);
+    border-top: 1px solid var(--win-dark);
+    box-sizing: border-box;
+}
+
+.listen-window__header {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.listen-window__cover {
+    width: 108px;
+    height: 108px;
+    flex-shrink: 0;
+    object-fit: cover;
+    background: #000;
+    border: 2px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+    display: block;
+}
+
+.listen-window__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 4px;
+    min-width: 0;
+    color: #000;
+}
+
+.listen-window__artist {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.listen-window__album,
+.listen-window__type {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.listen-window__list {
+    background: #ffffff;
+    border: 2px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+    box-sizing: border-box;
+}
+
+.listen-window__list-head,
+.listen-window__track {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    box-sizing: border-box;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.2;
+    color: #000;
+}
+
+.listen-window__list-head {
+    font-weight: 700;
+    border-bottom: 1px solid #d0d0d0;
+    background: #f3f3f3;
+}
+
+.listen-window__track {
+    border: none;
+    border-bottom: 1px solid #ececec;
+    background: transparent;
+    cursor: pointer;
+}
+
+.listen-window__track:last-child {
+    border-bottom: none;
+}
+
+.listen-window__track:hover,
+.listen-window__track:focus-visible {
+    background: #000080;
+    color: #ffffff;
+    outline: none;
+}
+
+.listen-window__col-num {
+    opacity: 0.85;
+}

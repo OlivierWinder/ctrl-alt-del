@@ -1,5 +1,4 @@
-import { desktopIcons, emailApp, notesApp, pdfWindows, simpleWindows } from '../data/content';
-import { folderWindows } from '../data/filesStructure';
+import { desktopIcons, emailApp, folderWindows, notesApp, pdfWindows, simpleWindows } from '../data/content';
 
 const DEFAULT_ICON = '/RESOURCES/folder.png';
 
@@ -33,6 +32,27 @@ export function getWindowMeta(win) {
     return {
       title: win.title || notesApp.title || 'NOTES',
       icon: desktopIcon?.icon || '/RESOURCES/notes_icon.png',
+    };
+  }
+
+  if (win.type === 'credits') {
+    return {
+      title: win.title || 'Credits',
+      icon: '/RESOURCES/notes_icon.png',
+    };
+  }
+
+  if (win.type === 'listen') {
+    return {
+      title: win.title || 'Listen',
+      icon: desktopIcon?.icon || '/RESOURCES/cd_audio.png',
+    };
+  }
+
+  if (win.type === 'rat_race') {
+    return {
+      title: win.title || 'RatRaceRevolution',
+      icon: desktopIcon?.icon || '/RESOURCES/rat_race_revolution_ICON_FR.png',
     };
   }
 

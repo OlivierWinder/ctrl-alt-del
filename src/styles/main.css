@@ -209,7 +209,6 @@ body {
     bottom: calc(100% + 4px);
     display: flex;
     width: 220px;
-    min-height: 280px;
     background: var(--win-gray);
     border: 2px solid;
     border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
@@ -612,7 +611,8 @@ body {
 }
 
 .window__folder img,
-.window__folder .pdf-thumb-icon {
+.window__folder .pdf-thumb-icon,
+.window__folder .image-thumb-icon {
     width: var(--icon-size);
     height: var(--icon-size);
     padding: 8px 8px 2px;
@@ -627,6 +627,16 @@ body {
 
 .window__folder .pdf-thumb-icon {
     image-rendering: auto;
+}
+
+.window__folder .image-thumb-icon {
+    image-rendering: auto;
+    object-fit: cover;
+    object-position: center;
+    background: #ffffff;
+    border: 1px solid;
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+    padding: 2px;
 }
 
 .window__folder span {

@@ -1,3 +1,6 @@
+import { folderWindows as filesFolderWindows } from './filesStructure';
+import { listenFolderWindows } from './listenStructure';
+
 // Flip to false to show LISTEN / CD-ROM / AI again after screen recording.
 export const hideIconsForRecording = false;
 
@@ -56,7 +59,10 @@ export const desktopIcons = [
   },
 ];
 
-export { folderWindows } from './filesStructure';
+export const folderWindows = {
+  ...filesFolderWindows,
+  ...listenFolderWindows,
+};
 
 export const pdfWindows = {
   internet: {

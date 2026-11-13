@@ -10,6 +10,10 @@ import './styles/image-viewer.css';
 import './styles/error-dialog.css';
 import './styles/notes-app.css';
 import './styles/email-app.css';
+import './styles/system-blue-screen.css';
+import './styles/credits-window.css';
+import './styles/ratrace-window.css';
+import './styles/listen-window.css';
 
 document.documentElement.style.setProperty(
   '--desktop-bg-url',

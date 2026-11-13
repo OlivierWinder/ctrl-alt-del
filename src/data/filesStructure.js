@@ -1,477 +1,339 @@
-// Auto-generated from FILES - Blad1.csv — do not edit by hand.
+// Auto-generated from CTRL-ALT-DEL-bestanden.csv — do not edit by hand.
 // Regenerate: node scripts/build-files-structure.mjs
 
 export const folderWindows = {
-  bird_s_eye_view_the_message: {
-    title: 'THE MESSAGE',
-    address: 'THE MESSAGE',
-    items: [
-      {
-        label: 'TRWNBT.gif',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/TRWNBT.gif'
-      },
-      {
-        label: '!!!.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/!!!.jpg'
-      },
-      {
-        label: 'personality.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/personality.jpg'
-      },
-      {
-        label: 'Kill the machine.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/Kill%20the%20machine.jpg'
-      },
-      {
-        label: 'b59e3bcb625a238b7e3356b32e8b1850.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/b59e3bcb625a238b7e3356b32e8b1850.jpg'
-      },
-      {
-        label: '8fc9b70c1c6e53164473ad9e465f623c.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/8fc9b70c1c6e53164473ad9e465f623c.jpg'
-      },
-      {
-        label: 'imagination.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/imagination.jpg'
-      },
-      {
-        label: 'never too late.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/never%20too%20late.jpg'
-      },
-      {
-        label: 'truth.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/truth.jpg'
-      }
-    ]
-  },
-  bird_s_eye_view: {
-    title: 'Bird’s Eye View',
-    address: 'Bird’s Eye View',
+  lt3: {
+    title: '_<3',
+    address: '_<3',
     items: [
       {
         label: 'friday night.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/friday%20night.jpg'
+        image: '/RESOURCES/files/_<3/friday night.jpg'
       },
       {
-        label: 'cross.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/cross.jpg'
-      },
-      {
-        label: 'yuh.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/yuh.jpg'
-      },
-      {
-        label: 'errgh.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/errgh.jpg'
-      },
-      {
-        label: 'might fuck around.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/might%20fuck%20around.jpg'
-      },
-      {
-        label: 'Maria.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/Maria.jpg'
+        label: 'frog_sanctuary_donation_invoice.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_<3/frog_sanctuary_donation_invoice.pdf'
       },
       {
         label: 'full of life.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/full%20of%20life.jpg'
-      },
-      {
-        label: 'thanks god.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/thanks%20god.jpg'
-      },
-      {
-        label: 'coverart_ver3.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/coverart_ver3.jpeg'
-      },
-      {
-        label: 'THE MESSAGE',
-        icon: '/RESOURCES/folder.png',
-        opens: 'bird_s_eye_view_the_message'
-      },
-      {
-        label: 'Music_and_Protest.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/Music_and_Protest.pdf'
-      },
-      {
-        label: 'tiger love.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/tiger%20love.jpeg'
-      },
-      {
-        label: '3 act structure.png',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/3%20act%20structure.png'
-      },
-      {
-        label: 'ouroboros.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/ouroboros.jpg'
-      },
-      {
-        label: 'bring back god.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/bring%20back%20god.jpg'
-      },
-      {
-        label: 'sometimes.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/sometimes.jpg'
-      },
-      {
-        label: 'cd 2.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/cd%202.jpg'
-      },
-      {
-        label: 'consuming.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/consuming.jpg'
+        image: '/RESOURCES/files/_<3/full of life.jpg'
       },
       {
         label: 'gay ok.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/gay%20ok.jpg'
+        image: '/RESOURCES/files/_<3/gay ok.jpg'
       },
       {
-        label: 'RIP David Dees.jpg',
+        label: 'tiger love.jpeg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/RIP%20David%20Dees.jpg'
+        image: '/RESOURCES/files/_<3/tiger love.jpeg'
+      }
+    ]
+  },
+  blacklisted: {
+    title: '_blacklisted',
+    address: '_blacklisted',
+    items: [
+      {
+        label: 'barlow1.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/barlow1.pdf'
       },
       {
-        label: 'patrick star hoverboard.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/patrick%20star%20hoverboard.jpeg'
+        label: 'Bertrand Russell - In Praise of Idleness.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/Bertrand Russell - In Praise of Idleness.pdf'
       },
       {
-        label: 'sweet baby jesus.jpg',
+        label: 'CSET-Hacking-AI-1-.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/CSET-Hacking-AI-1-.pdf'
+      },
+      {
+        label: 'meditationsofmar00marc.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/meditationsofmar00marc.pdf'
+      },
+      {
+        label: 'petr-kropotkin-mutual-aid-a-factor-of-evolution.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/petr-kropotkin-mutual-aid-a-factor-of-evolution.pdf'
+      },
+      {
+        label: 'Politics of Obedience.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/Politics of Obedience.pdf'
+      },
+      {
+        label: 'PoliticsandEngLang.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/PoliticsandEngLang.pdf'
+      },
+      {
+        label: 'ready.gov_power-outage_hazard-info-sheet.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/ready.gov_power-outage_hazard-info-sheet.pdf'
+      },
+      {
+        label: 'scrndhamma.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/scrndhamma.pdf'
+      },
+      {
+        label: 'The_Meditations_of_the_Emperor_Marcus_Aurelius_Antoninus.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/The_Meditations_of_the_Emperor_Marcus_Aurelius_Antoninus.pdf'
+      },
+      {
+        label: 'The_Soul_of_Man_under_Socialism.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_blacklisted/The_Soul_of_Man_under_Socialism.pdf'
+      }
+    ]
+  },
+  fuel_the_resistance: {
+    title: '_fuel-the-resistance',
+    address: '_fuel-the-resistance',
+    items: [
+      {
+        label: 'a_instruction.png',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/sweet%20baby%20jesus.jpg'
+        image: '/RESOURCES/files/_fuel-the-resistance/a_instruction.png'
+      },
+      {
+        label: 'cd 2.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_fuel-the-resistance/cd 2.jpg'
+      },
+      {
+        label: 'electronics.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_fuel-the-resistance/electronics.jpg'
+      },
+      {
+        label: 'fig2.png',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_fuel-the-resistance/fig2.png'
+      },
+      {
+        label: 'keyphone.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_fuel-the-resistance/keyphone.jpg'
+      },
+      {
+        label: 'might fuck around.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_fuel-the-resistance/might fuck around.jpg'
+      },
+      {
+        label: 'types-of-prompt-injection-attacks.png',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_fuel-the-resistance/types-of-prompt-injection-attacks.png'
+      }
+    ]
+  },
+  life_in_this_world: {
+    title: '_life-in-this-world',
+    address: '_life-in-this-world',
+    items: [
+      {
+        label: '63346105109e4d195709ab3bfec33048.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/63346105109e4d195709ab3bfec33048.jpg'
+      },
+      {
+        label: 'AI heaven.png',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/AI heaven.png'
+      },
+      {
+        label: 'b19985d6e47901d7e02d335893668494.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/b19985d6e47901d7e02d335893668494.jpg'
       },
       {
         label: 'birth.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/birth.jpg'
+        image: '/RESOURCES/files/_life-in-this-world/birth.jpg'
       },
       {
-        label: 'wake up.jpg',
+        label: 'can.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/wake%20up.jpg'
-      },
-      {
-        label: 'PLS.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/PLS.jpg'
-      },
-      {
-        label: 'sigh.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/sigh.jpg'
-      },
-      {
-        label: 'trinity.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/trinity.jpg'
-      },
-      {
-        label: 'thank you.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/thank%20you.jpg'
-      },
-      {
-        label: 'see no.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/see%20no.jpg'
-      },
-      {
-        label: 'time to lock in.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/time%20to%20lock%20in.jpg'
-      },
-      {
-        label: 'run.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/run.jpg'
-      },
-      {
-        label: 'sick.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/sick.jpg'
-      },
-      {
-        label: 'swag.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/swag.jpg'
-      },
-      {
-        label: 'time.jpg',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/time.jpg'
-      },
-      {
-        label: 'CAD COVER.png',
-        icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/CAD%20COVER.png'
-      }
-    ]
-  },
-  demos_ep: {
-    title: 'EP',
-    address: 'EP',
-    items: [
-      {
-        label: 'mantra.wav',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/mantra.wav',
-        opens: 'cd_player',
-        cover: '/RESOURCES/ep_cover.jpg',
-        autoplay: true
-      },
-      {
-        label: 'a tryer is a winner.wav',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/a%20tryer%20is%20a%20winner.wav',
-        opens: 'cd_player',
-        cover: '/RESOURCES/ep_cover.jpg'
-      },
-      {
-        label: 'skit 1.wav',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/skit%201.wav',
-        opens: 'cd_player',
-        cover: '/RESOURCES/ep_cover.jpg'
-      },
-      {
-        label: 'no hate.wav',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/no%20hate.wav',
-        opens: 'cd_player',
-        cover: '/RESOURCES/ep_cover.jpg'
-      },
-      {
-        label: 'gimme a mf break.wav',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/gimme%20a%20mf%20break.wav',
-        opens: 'cd_player',
-        cover: '/RESOURCES/ep_cover.jpg'
-      },
-      {
-        label: '5-1.wav',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/5-1.wav',
-        opens: 'cd_player',
-        cover: '/RESOURCES/ep_cover.jpg'
-      },
-      {
-        label: 'slowly.wav',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/slowly.wav',
-        opens: 'cd_player',
-        cover: '/RESOURCES/ep_cover.jpg'
-      }
-    ]
-  },
-  demos: {
-    title: 'DEMOS',
-    address: 'DEMOS',
-    items: [
-      {
-        label: 'lessen ambient 2.00.mp3',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/lessen%20ambient%202.00.mp3',
-        opens: 'cd_player'
-      },
-      {
-        label: 'EP',
-        icon: '/RESOURCES/folder.png',
-        opens: 'demos_ep'
-      },
-      {
-        label: 'LVL UP v2.mp3',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/LVL%20UP%20v2.mp3',
-        opens: 'cd_player'
-      },
-      {
-        label: 'choose.mp3',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/choose.mp3',
-        opens: 'cd_player'
-      },
-      {
-        label: 'now is just now .mp3',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/now%20is%20just%20now%20.mp3',
-        opens: 'cd_player'
-      },
-      {
-        label: '29.01.24 tove lov stay high edit v0.mp3',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/29.01.24%20tove%20lov%20stay%20high%20edit%20v0.mp3',
-        opens: 'cd_player'
-      }
-    ]
-  },
-  files_documents: {
-    title: 'Documents',
-    address: 'Documents',
-    items: [
-      {
-        label: 'frog_sanctuary_donation_invoice.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/frog_sanctuary_donation_invoice.pdf'
-      },
-      {
-        label: 'studio_rental_invoice_wisseloord.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/studio_rental_invoice_wisseloord.pdf'
-      },
-      {
-        label: 'Literature_Review_OlivierWinder_AW_V2.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/Literature_Review_OlivierWinder_AW_V2.pdf'
-      },
-      {
-        label: 'LILĒ.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/LILE%CC%84.pdf'
-      },
-      {
-        label: 'towards-progressive-art.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/towards-progressive-art.pdf'
+        image: '/RESOURCES/files/_life-in-this-world/can.jpg'
       },
       {
         label: 'censorship_warning.pdf',
         icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/censorship_warning.pdf'
+        pdf: '/RESOURCES/files/_life-in-this-world/censorship_warning.pdf'
+      },
+      {
+        label: 'down.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/down.jpg'
+      },
+      {
+        label: 'e04e1dffc12b10ec5aa2514c4c2badc6.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/e04e1dffc12b10ec5aa2514c4c2badc6.jpg'
+      },
+      {
+        label: 'e6ecd71722611c166da71c2509ca703d.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/e6ecd71722611c166da71c2509ca703d.jpg'
       },
       {
         label: 'internet_censorship_act.pdf',
         icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/internet_censorship_act.pdf'
+        pdf: '/RESOURCES/files/_life-in-this-world/internet_censorship_act.pdf'
       },
       {
-        label: 'master_key_system.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/master_key_system.pdf'
+        label: 'LIMINAL SPACE 2.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/LIMINAL SPACE 2.jpg'
       },
       {
-        label: 'request_cultural_funding_money.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/request_cultural_funding_money.pdf'
+        label: 'Liminal_space1.webp',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/Liminal_space1.webp'
+      },
+      {
+        label: 'me.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/me.jpg'
+      },
+      {
+        label: 'now?.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/now?.jpg'
+      },
+      {
+        label: 'outside my house.png',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/outside my house.png'
       },
       {
         label: 'request_denied_CFM.pdf',
         icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/request_denied_CFM.pdf'
+        pdf: '/RESOURCES/files/_life-in-this-world/request_denied_CFM.pdf'
+      },
+      {
+        label: 'see.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/see.jpg'
+      },
+      {
+        label: 'sick.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/sick.jpg'
+      },
+      {
+        label: 'surveill.jpeg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/surveill.jpeg'
+      },
+      {
+        label: 'you.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_life-in-this-world/you.jpg'
       }
     ]
   },
-  downloads_vocals_155_f_min: {
-    title: 'VOCALS (155 - F#MIN)',
-    address: 'VOCALS (155 - F#MIN)',
-    items: []
-  },
-  downloads: {
-    title: 'Downloads',
-    address: 'Downloads',
+  manifesto: {
+    title: '_manifesto',
+    address: '_manifesto',
     items: [
       {
-        label: 'towards-progressive-art.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/towards-progressive-art.pdf'
-      },
-      {
-        label: 'RatRaceRevolution.dmg',
-        icon: '/RESOURCES/folder.png',
-        errorAction: 'rat_race_revolution'
-      },
-      {
-        label: 'Literature_Review_OlivierWinder_AW_V2.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/Literature_Review_OlivierWinder_AW_V2.pdf'
-      },
-      {
-        label: 'LILĒ.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/LILE%CC%84.pdf'
-      },
-      {
-        label: 'frog_sanctuary_donation_invoice.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/frog_sanctuary_donation_invoice.pdf'
-      },
-      {
-        label: 'studio_rental_invoice_wisseloord.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/studio_rental_invoice_wisseloord.pdf'
-      },
-      {
-        label: '3 act structure.png',
+        label: '!!!.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/3%20act%20structure.png'
+        image: '/RESOURCES/files/_manifesto/!!!.jpg'
       },
       {
-        label: 'VOCALS (155 - F#MIN)',
-        icon: '/RESOURCES/folder.png',
-        opens: 'downloads_vocals_155_f_min'
-      },
-      {
-        label: 'censorship_warning.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/censorship_warning.pdf'
-      }
-    ]
-  },
-  recents: {
-    title: 'Recents',
-    address: 'Recents',
-    items: [
-      {
-        label: 'towards-progressive-art.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/towards-progressive-art.pdf'
-      },
-      {
-        label: 'internet_censorship_act.pdf',
-        icon: '/RESOURCES/folder.png',
-        pdf: '/RESOURCES/files/internet_censorship_act.pdf'
-      },
-      {
-        label: 'bring back god.jpg',
+        label: 'F*ck ICE.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/bring%20back%20god.jpg'
+        image: '/RESOURCES/files/_manifesto/F*ck ICE.jpg'
       },
       {
-        label: 'now is just now .mp3',
-        icon: '/RESOURCES/cd_audio.png',
-        audio: '/RESOURCES/files/now%20is%20just%20now%20.mp3',
-        opens: 'cd_player'
-      },
-      {
-        label: 'coverart_ver2.jpg',
+        label: 'fast-paced.jpg',
         icon: '/RESOURCES/image_file.png',
-        image: '/RESOURCES/files/coverart_ver2.jpeg'
+        image: '/RESOURCES/files/_manifesto/fast-paced.jpg'
+      },
+      {
+        label: 'feudotechno.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/feudotechno.jpg'
+      },
+      {
+        label: 'i use it.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/i use it.jpg'
+      },
+      {
+        label: 'inspirational game.jpeg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/inspirational game.jpeg'
+      },
+      {
+        label: 'Kill the machine.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/Kill the machine.jpg'
+      },
+      {
+        label: 'learn basic economics.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/learn basic economics.jpg'
+      },
+      {
+        label: 'long live authenticity.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/long live authenticity.jpg'
+      },
+      {
+        label: 'ouroboros.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/ouroboros.jpg'
+      },
+      {
+        label: 'patriots.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/patriots.jpg'
+      },
+      {
+        label: 'R u?.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/R u?.jpg'
+      },
+      {
+        label: 'reflection.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/reflection.jpg'
+      },
+      {
+        label: 'resist.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/resist.jpg'
+      },
+      {
+        label: 'TGKA.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/TGKA.jpg'
+      },
+      {
+        label: 'the product.jpg',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/the product.jpg'
+      },
+      {
+        label: 'towards progressive art.pdf',
+        icon: '/RESOURCES/folder.png',
+        pdf: '/RESOURCES/files/_manifesto/towards progressive art.pdf'
+      },
+      {
+        label: 'TRWNBT.gif',
+        icon: '/RESOURCES/image_file.png',
+        image: '/RESOURCES/files/_manifesto/TRWNBT.gif'
       }
     ]
   },
@@ -480,29 +342,29 @@ export const folderWindows = {
     address: 'Files',
     items: [
       {
-        label: 'Bird’s Eye View',
+        label: '_<3',
         icon: '/RESOURCES/folder.png',
-        opens: 'bird_s_eye_view'
+        opens: 'lt3'
       },
       {
-        label: 'DEMOS',
+        label: '_blacklisted',
         icon: '/RESOURCES/folder.png',
-        opens: 'demos'
+        opens: 'blacklisted'
       },
       {
-        label: 'Documents',
+        label: '_fuel-the-resistance',
         icon: '/RESOURCES/folder.png',
-        opens: 'files_documents'
+        opens: 'fuel_the_resistance'
       },
       {
-        label: 'Downloads',
+        label: '_life-in-this-world',
         icon: '/RESOURCES/folder.png',
-        opens: 'downloads'
+        opens: 'life_in_this_world'
       },
       {
-        label: 'Recents',
+        label: '_manifesto',
         icon: '/RESOURCES/folder.png',
-        opens: 'recents'
+        opens: 'manifesto'
       }
     ]
   }

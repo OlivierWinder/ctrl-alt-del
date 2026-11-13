@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RatRaceRevolution</title>
+  <style>
+    :root {
+      --bg: #0a0a0c;
+      --panel: #c0c0c0;
+      --ink: #e8e8e8;
+      --dim: #7a7a7a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a0a0c;
+      color: #e8e8e8;
+      font-family: "Courier New", Courier, monospace;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    #wrap {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0a0a0c;
+    }
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      background: #050508;
+      max-width: 100%;
+      max-height: 100%;
+      border: 2px solid #808080;
+      border-color: #404040 #dfdfdf #dfdfdf #404040;
+      cursor: none;
+    }
+    canvas.menu { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="wrap"><canvas id="game" class="menu" width="640" height="400"></canvas></div>
+  <script>
+(function () {
+  'use strict';
+
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+
+  const W = 640;
+  const H = 400;
+  const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
+  const CLOCKS = ['09:00', '11:40', '14:20', '17:00'];
+
+  const STATE = {
+    MENU: 'menu',
+    PLAY: 'play',
+    BANNER: 'banner',
+    BETWEEN: 'between',
+    EXIT: 'exit',
+    VOID: 'void',
+    PAUSED: 'paused',
+  };
+
+  const keys = Object.create(null);
+  let pointerY = null;
+  let pointerActive = false;
+  let touchId = null;
+
+  const game = {
+    mode: STATE.MENU,
+    paused: false,
+    resumeMode: STATE.MENU,
+    ratScore: 0,
+    systemScore: 0,
+    rallyCount: 0,
+    dayIndex: 0,
+    dayPoint: 0,
+    clockIndex: 0,
+    clockDisplay: '09:00',
+    playerOnLeft: true,
+    exitUsed: false,
+    bannerText: '',
+    bannerUntil: 0,
+    betweenUntil: 0,
+    voidUntil: 0,
+    flashUntil: 0,
+    money: null,
+    serveSide: 'system',
+    nextIsCoin: true,
+    boundsInset: 0,
+    serveSpeed: 3.2,
+    maxSpeed: 8.2,
+    systemDelay: 110,
+    systemSpeed: 3.1,
+    systemFlicker: false,
+    systemTargetY: H / 2,
+    systemReactAt: 0,
+    player: makePaddle(true),
+    system: makePaddle(false),
+    exitGap: null,
+    audioEnabled: false,
+    lastTick: 0,
+    anim: 0,
+  };
+
+  function makePaddle(isRat) {
+    return {
+      x: isRat ? 36 : W - 52,
+      y: H / 2,
+      w: 18,
+      h: 56,
+      vx: 0,
+      vy: 0,
+    };
+  }
+
+  function clamp(v, a, b) {
+    return Math.max(a, Math.min(b, v));
+  }
+
+  function resetDaySettings() {
+    game.boundsInset = 0;
+    game.serveSpeed = 3.2;
+    game.systemDelay = 110;
+    game.systemSpeed = 3.1;
+    game.systemFlicker = false;
+  }
+
+  function applyDaySettings() {
+    const day = game.dayIndex;
+    if (day === 0) {
+      resetDaySettings();
+    } else if (day === 1) {
+      game.serveSpeed = Math.min(4.6, 3.2 + game.dayPoint * 0.35);
+    } else if (day === 2) {
+      game.systemDelay = 70;
+      game.systemSpeed = 3.7;
+      game.systemFlicker = true;
+    } else if (day >= 3) {
+      game.boundsInset = 28;
+      game.systemDelay = 70;
+      game.systemSpeed = 3.7;
+      game.systemFlicker = true;
+      game.serveSpeed = Math.min(4.8, 3.6 + game.dayPoint * 0.25);
+    }
+  }
+
+  function playfieldTop() {
+    return 28 + game.boundsInset;
+  }
+
+  function playfieldBottom() {
+    return H - 8 - game.boundsInset;
+  }
+
+  function placePaddles() {
+    const top = playfieldTop();
+    const bottom = playfieldBottom();
+    const mid = (top + bottom) / 2;
+    if (game.playerOnLeft) {
+      game.player.x = 36;
+      game.system.x = W - 52;
+    } else {
+      game.player.x = W - 52;
+      game.system.x = 36;
+    }
+    game.player.y = mid;
+    game.system.y = mid;
+    game.systemTargetY = mid;
+  }
+
+  function startSession() {
+    game.ratScore = 0;
+    game.systemScore = 0;
+    game.rallyCount = 0;
+    game.dayIndex = 0;
+    game.dayPoint = 0;
+    game.clockIndex = 0;
+    game.clockDisplay = '09:00';
+    game.playerOnLeft = true;
+    game.exitUsed = false;
+    game.nextIsCoin = true;
+    game.serveSide = 'system';
+    game.money = null;
+    game.exitGap = null;
+    resetDaySettings();
+    placePaddles();
+    game.mode = STATE.BANNER;
+    game.bannerText = 'MONDAY';
+    game.bannerUntil = performance.now() + 1100;
+  }
+
+  function beginRally() {
+    applyDaySettings();
+    placePaddles();
+    const top = playfieldTop();
+    const bottom = playfieldBottom();
+    const midY = (top + bottom) / 2;
+    game.player.y = midY;
+    game.system.y = midY;
+    game.systemTargetY = midY;
+
+    const fromLeft = game.serveSide === 'left'
+      || (game.serveSide === 'system' && !game.playerOnLeft)
+      || (game.serveSide === 'player' && game.playerOnLeft);
+
+    const speed = game.serveSpeed;
+    const angle = (Math.random() * 0.5 - 0.25);
+    game.money = {
+      x: fromLeft ? 70 : W - 70,
+      y: midY,
+      vx: (fromLeft ? 1 : -1) * speed * Math.cos(angle),
+      vy: speed * Math.sin(angle) * 1.2,
+      r: 8,
+      kind: game.nextIsCoin ? 'coin' : 'note',
+      spin: 0,
+    };
+    game.nextIsCoin = !game.nextIsCoin;
+    game.mode = STATE.PLAY;
+    game.systemReactAt = performance.now() + game.systemDelay;
+  }
+
+  function afterBanner() {
+    if (game.bannerText === 'MONDAY' || DAYS.includes(game.bannerText)) {
+      beginRally();
+      return;
+    }
+    if (game.bannerText === 'NEW TARGET' || game.bannerText === 'PERFORMANCE REVIEW' || game.bannerText === 'COST CUTS') {
+      beginRally();
+    }
+  }
+
+  function showDayBanner() {
+    const day = DAYS[game.dayIndex];
+    if (game.dayIndex === 1 && game.dayPoint === 0) {
+      game.mode = STATE.BANNER;
+      game.bannerText = 'NEW TARGET';
+      game.bannerUntil = performance.now() + 1000;
+      return;
+    }
+    if (game.dayIndex === 2 && game.dayPoint === 0) {
+      game.mode = STATE.BANNER;
+      game.bannerText = 'PERFORMANCE REVIEW';
+      game.bannerUntil = performance.now() + 1000;
+      return;
+    }
+    if (game.dayIndex === 3 && game.dayPoint === 0) {
+      game.mode = STATE.BANNER;
+      game.bannerText = 'COST CUTS';
+      game.bannerUntil = performance.now() + 1000;
+      return;
+    }
+    if (game.dayPoint === 0 && (game.dayIndex === 0 || game.dayIndex === 4)) {
+      game.mode = STATE.BANNER;
+      game.bannerText = day;
+      game.bannerUntil = performance.now() + 900;
+      return;
+    }
+    beginRally();
+  }
+
+  function advanceClockAfterPoint() {
+    game.dayPoint += 1;
+    game.rallyCount += 1;
+    game.clockIndex = Math.min(3, game.dayPoint);
+    game.clockDisplay = CLOCKS[game.clockIndex];
+    game.money = null;
+
+    if (game.dayPoint >= 3) {
+      game.mode = STATE.BETWEEN;
+      game.betweenUntil = performance.now() + 700;
+      game.flashUntil = performance.now() + 700;
+      return;
+    }
+
+    game.mode = STATE.BETWEEN;
+    game.betweenUntil = performance.now() + 550;
+  }
+
+  function endWorkday() {
+    const finishedFriday = game.dayIndex === 4;
+    const shouldExit = finishedFriday && !game.exitUsed && game.rallyCount >= 15;
+
+    if (shouldExit) {
+      startExitSequence();
+      return;
+    }
+
+    game.dayIndex = (game.dayIndex + 1) % 5;
+    game.dayPoint = 0;
+    game.clockIndex = 0;
+    game.clockDisplay = '09:00';
+    if (game.dayIndex === 0) resetDaySettings();
+    showDayBanner();
+  }
+
+  function startExitSequence() {
+    game.exitUsed = true;
+    game.clockDisplay = '17:01';
+    game.money = null;
+    game.exitGap = {
+      x: W - 6,
+      y: H / 2,
+      h: 78,
+      w: 14,
+    };
+    game.mode = STATE.EXIT;
+    game.player.vx = 0;
+    game.player.vy = 0;
+  }
+
+  function completeEscape() {
+    game.mode = STATE.VOID;
+    game.voidUntil = performance.now() + 1800;
+    game.exitGap = null;
+    game.money = null;
+  }
+
+  function returnToWork() {
+    game.playerOnLeft = false;
+    game.serveSide = 'system';
+    game.dayIndex = 0;
+    game.dayPoint = 0;
+    game.clockIndex = 0;
+    game.clockDisplay = '09:00';
+    resetDaySettings();
+    placePaddles();
+    game.mode = STATE.BANNER;
+    game.bannerText = 'MONDAY';
+    game.bannerUntil = performance.now() + 1100;
+  }
+
+  function scorePoint(scorer) {
+    if (scorer === 'rat') game.ratScore += 1;
+    else game.systemScore += 1;
+    game.serveSide = scorer === 'rat' ? 'player' : 'system';
+    advanceClockAfterPoint();
+  }
+
+  function paddleBounds(p) {
+    const top = playfieldTop();
+    const bottom = playfieldBottom();
+    p.y = clamp(p.y, top + p.h / 2, bottom - p.h / 2);
+  }
+
+  function updatePlayer(dt) {
+    const speed = game.mode === STATE.EXIT ? 160 : 220;
+    let vy = 0;
+    let vx = 0;
+
+    if (keys.ArrowUp || keys.w || keys.W) vy -= 1;
+    if (keys.ArrowDown || keys.s || keys.S) vy += 1;
+
+    if (game.mode === STATE.EXIT) {
+      if (keys.ArrowLeft || keys.a || keys.A) vx -= 1;
+      if (keys.ArrowRight || keys.d || keys.D) vx += 1;
+    }
+
+    if (pointerActive && pointerY != null && game.mode !== STATE.EXIT) {
+      const target = pointerY;
+      const diff = target - game.player.y;
+      game.player.y += clamp(diff, -speed * dt * 1.4, speed * dt * 1.4);
+    } else {
+      game.player.y += vy * speed * dt;
+      if (game.mode === STATE.EXIT) {
+        game.player.x += vx * speed * dt;
+      }
+    }
+
+    if (game.mode === STATE.EXIT) {
+      game.player.x = clamp(game.player.x, 20, W - 20);
+      game.player.y = clamp(game.player.y, 40, H - 20);
+    } else {
+      if (!game.playerOnLeft) game.player.x = W - 52;
+      else game.player.x = 36;
+      paddleBounds(game.player);
+    }
+  }
+
+  function updateSystem(now, dt) {
+    if (game.mode === STATE.EXIT) return;
+    const m = game.money;
+    if (!m) return;
+
+    if (now >= game.systemReactAt) {
+      const lead = m.vx * (game.playerOnLeft ? 0.08 : -0.08);
+      game.systemTargetY = m.y + (m.vy * 0.12) + lead * 20;
+    }
+
+    const diff = game.systemTargetY - game.system.y;
+    const step = clamp(diff, -game.systemSpeed * 60 * dt, game.systemSpeed * 60 * dt);
+    game.system.y += step;
+    paddleBounds(game.system);
+  }
+
+  function bounceOffPaddle(paddle, fromLeft) {
+    const m = game.money;
+    const rel = (m.y - paddle.y) / (paddle.h / 2);
+    const clamped = clamp(rel, -1, 1);
+    const angle = clamped * 0.65;
+    const speed = Math.min(game.maxSpeed, Math.hypot(m.vx, m.vy) * 1.06 + 0.12);
+    const dir = fromLeft ? 1 : -1;
+    m.vx = dir * speed * Math.cos(angle);
+    m.vy = speed * Math.sin(angle);
+    m.x = fromLeft ? paddle.x + paddle.w / 2 + m.r + 1 : paddle.x - paddle.w / 2 - m.r - 1;
+    game.systemReactAt = performance.now() + game.systemDelay;
+  }
+
+  function collidePaddle(paddle) {
+    const m = game.money;
+    const left = paddle.x - paddle.w / 2;
+    const right = paddle.x + paddle.w / 2;
+    const top = paddle.y - paddle.h / 2;
+    const bottom = paddle.y + paddle.h / 2;
+    return (
+      m.x + m.r > left
+      && m.x - m.r < right
+      && m.y + m.r > top
+      && m.y - m.r < bottom
+    );
+  }
+
+  function updateMoney(dt) {
+    const m = game.money;
+    if (!m) return;
+    m.x += m.vx * 60 * dt;
+    m.y += m.vy * 60 * dt;
+    m.spin += dt * 8;
+
+    const top = playfieldTop();
+    const bottom = playfieldBottom();
+    if (m.y - m.r < top) {
+      m.y = top + m.r;
+      m.vy = Math.abs(m.vy);
+    } else if (m.y + m.r > bottom) {
+      m.y = bottom - m.r;
+      m.vy = -Math.abs(m.vy);
+    }
+
+    const player = game.player;
+    const system = game.system;
+
+    if (collidePaddle(player)) {
+      const fromLeft = player.x < W / 2;
+      if ((fromLeft && m.vx < 0) || (!fromLeft && m.vx > 0)) {
+        bounceOffPaddle(player, fromLeft);
+      }
+    }
+    if (collidePaddle(system)) {
+      const fromLeft = system.x < W / 2;
+      if ((fromLeft && m.vx < 0) || (!fromLeft && m.vx > 0)) {
+        bounceOffPaddle(system, fromLeft);
+      }
+    }
+
+    if (m.x < -20) {
+      if (game.playerOnLeft) scorePoint('system');
+      else scorePoint('rat');
+    } else if (m.x > W + 20) {
+      if (game.playerOnLeft) scorePoint('rat');
+      else scorePoint('system');
+    }
+  }
+
+  function updateExit() {
+    const gap = game.exitGap;
+    if (!gap) return;
+    const p = game.player;
+    if (p.x > W - 24 && Math.abs(p.y - gap.y) < gap.h / 2 + 10) {
+      completeEscape();
+    }
+  }
+
+  // ---------- drawing ----------
+  function fillRect(x, y, w, h, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+  }
+
+  function drawPixel(x, y, color) {
+    fillRect(x, y, 2, 2, color);
+  }
+
+  function drawRat(p, facingRight) {
+    const x = Math.round(p.x);
+    const y = Math.round(p.y);
+    const dir = facingRight ? 1 : -1;
+    // body
+    fillRect(x - 7, y - 18, 14, 36, '#6b6b6b');
+    fillRect(x - 5, y - 14, 10, 28, '#8a8a8a');
+    // snout
+    fillRect(x + dir * 8, y - 6, dir * 10, 8, '#9a9a9a');
+    fillRect(x + dir * 16, y - 3, dir * 4, 3, '#222');
+    // eye
+    fillRect(x + dir * 4, y - 10, 3, 3, '#111');
+    fillRect(x + dir * 5, y - 9, 1, 1, '#fff');
+    // ears
+    fillRect(x - 8, y - 22, 5, 5, '#7a7a7a');
+    fillRect(x + 3, y - 22, 5, 5, '#7a7a7a');
+    // bandana
+    fillRect(x - 8, y - 12, 16, 5, '#c01010');
+    fillRect(x - dir * 10, y - 10, 4, 8, '#a00');
+    // legs
+    fillRect(x - 6, y + 16, 4, 8, '#555');
+    fillRect(x + 2, y + 16, 4, 8, '#555');
+    // tail
+    const tx = x - dir * 10;
+    fillRect(tx, y + 4, -dir * 14, 3, '#777');
+    fillRect(tx - dir * 12, y + 2, -dir * 6, 3, '#777');
+  }
+
+  function drawSystem(p) {
+    const x = Math.round(p.x);
+    const y = Math.round(p.y);
+    fillRect(x - 12, y - 26, 24, 52, '#2a2a2e');
+    fillRect(x - 10, y - 24, 20, 48, '#3a3a40');
+    // screen
+    fillRect(x - 8, y - 18, 16, 12, '#1a3040');
+    // slot
+    fillRect(x - 7, y + 2, 14, 4, '#111');
+    fillRect(x - 6, y + 3, 12, 2, '#444');
+    // light
+    const flicker = game.systemFlicker && game.money && performance.now() < game.systemReactAt;
+    fillRect(x - 3, y - 22, 6, 4, flicker ? '#ff3030' : '#801010');
+    // feet
+    fillRect(x - 10, y + 24, 8, 4, '#222');
+    fillRect(x + 2, y + 24, 8, 4, '#222');
+  }
+
+  function drawCoin(m) {
+    const x = Math.round(m.x);
+    const y = Math.round(m.y);
+    const squash = 0.65 + 0.35 * Math.abs(Math.cos(m.spin));
+    const rw = Math.max(3, Math.round(10 * squash));
+    fillRect(x - rw, y - 8, rw * 2, 16, '#d4a017');
+    fillRect(x - rw + 2, y - 6, rw * 2 - 4, 12, '#f0c040');
+    fillRect(x - 2, y - 3, 4, 6, '#a07800');
+  }
+
+  function drawNote(m) {
+    const x = Math.round(m.x);
+    const y = Math.round(m.y);
+    const flap = Math.sin(m.spin * 2) * 3;
+    fillRect(x - 12, y - 5 + flap, 24, 12, '#2f7a3a');
+    fillRect(x - 10, y - 3 + flap, 20, 8, '#3fa34f');
+    fillRect(x - 3, y - 1 + flap, 6, 4, '#c8e6c0');
+  }
+
+  function drawHud() {
+    ctx.fillStyle = '#c8c8c8';
+    ctx.font = '12px "Courier New", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('RAT ' + game.ratScore, 16, 18);
+    ctx.textAlign = 'right';
+    ctx.fillText('SYSTEM ' + game.systemScore, W - 16, 18);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#9a9a9a';
+    ctx.fillText(DAYS[game.dayIndex] + '  ' + game.clockDisplay, W / 2, 18);
+  }
+
+  function drawPlayfield() {
+    fillRect(0, 0, W, H, '#050508');
+    // inset walls on Thursday+
+    if (game.boundsInset > 0) {
+      fillRect(0, 24, W, game.boundsInset, '#121218');
+      fillRect(0, H - game.boundsInset, W, game.boundsInset, '#121218');
+      ctx.strokeStyle = '#333';
+      ctx.beginPath();
+      ctx.moveTo(0, playfieldTop());
+      ctx.lineTo(W, playfieldTop());
+      ctx.moveTo(0, playfieldBottom());
+      ctx.lineTo(W, playfieldBottom());
+      ctx.stroke();
+    }
+    // center dashed line
+    ctx.fillStyle = '#222';
+    for (let y = playfieldTop(); y < playfieldBottom(); y += 14) {
+      fillRect(W / 2 - 1, y, 2, 8, '#2a2a30');
+    }
+    drawHud();
+  }
+
+  function drawMenu() {
+    fillRect(0, 0, W, H, '#050508');
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#e8e8e8';
+    ctx.font = 'bold 28px "Courier New", monospace';
+    ctx.fillText('RatRaceRevolution', W / 2, 92);
+    ctx.font = '13px "Courier New", monospace';
+    ctx.fillStyle = '#9a9a9a';
+    ctx.fillText('An underground arcade left on this machine.', W / 2, 122);
+    ctx.fillStyle = '#c8c8c8';
+    ctx.fillText('CONTROLS', W / 2, 170);
+    ctx.fillStyle = '#8a8a8a';
+    ctx.fillText('UP / DOWN  or  W / S   —  move', W / 2, 196);
+    ctx.fillText('Touch: drag the rat vertically', W / 2, 216);
+    ctx.fillText('Survive the workweek.', W / 2, 250);
+
+    const bx = W / 2 - 70;
+    const by = 292;
+    fillRect(bx, by, 140, 36, '#c0c0c0');
+    fillRect(bx + 2, by + 2, 136, 32, '#dfdfdf');
+    ctx.fillStyle = '#000';
+    ctx.font = 'bold 14px "Courier New", monospace';
+    ctx.fillText('START', W / 2, by + 24);
+
+    game._startBtn = { x: bx, y: by, w: 140, h: 36 };
+  }
+
+  function drawBanner() {
+    drawPlayfield();
+    drawRat(game.player, game.playerOnLeft);
+    drawSystem(game.system);
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#f0f0f0';
+    ctx.font = 'bold 26px "Courier New", monospace';
+    ctx.fillText(game.bannerText, W / 2, H / 2);
+  }
+
+  function drawExit() {
+    drawPlayfield();
+    // right wall with gap
+    fillRect(W - 8, 24, 8, H - 24, '#1a1a20');
+    if (game.exitGap) {
+      const g = game.exitGap;
+      fillRect(W - 8, g.y - g.h / 2, 8, g.h, '#050508');
+      ctx.fillStyle = '#c8c8c8';
+      ctx.font = 'bold 12px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('EXIT', W - 28, g.y - g.h / 2 - 8);
+    }
+    drawRat(game.player, true);
+    // frozen system
+    drawSystem(game.system);
+    drawHud();
+  }
+
+  function drawVoid() {
+    fillRect(0, 0, W, H, '#030306');
+    drawRat({ x: W / 2, y: H / 2, w: 18, h: 56 }, true);
+  }
+
+  function drawPaused() {
+    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#e0e0e0';
+    ctx.font = 'bold 22px "Courier New", monospace';
+    ctx.fillText('PAUSED', W / 2, H / 2);
+  }
+
+  function render() {
+    if (game.mode === STATE.MENU) {
+      drawMenu();
+      return;
+    }
+    if (game.mode === STATE.VOID) {
+      drawVoid();
+      return;
+    }
+    if (game.mode === STATE.EXIT) {
+      drawExit();
+      if (game.paused) drawPaused();
+      return;
+    }
+    if (game.mode === STATE.BANNER) {
+      drawBanner();
+      return;
+    }
+
+    drawPlayfield();
+    drawRat(game.player, game.playerOnLeft);
+    drawSystem(game.system);
+    if (game.money) {
+      if (game.money.kind === 'coin') drawCoin(game.money);
+      else drawNote(game.money);
+    }
+    if (game.mode === STATE.BETWEEN && performance.now() < game.flashUntil) {
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ddd';
+      ctx.font = 'bold 20px "Courier New", monospace';
+      ctx.fillText(game.clockDisplay, W / 2, H / 2);
+    }
+    if (game.paused) drawPaused();
+  }
+
+  // ---------- loop ----------
+  let last = performance.now();
+
+  function frame(now) {
+    const dt = Math.min(0.033, (now - last) / 1000);
+    last = now;
+    game.anim += dt;
+
+    if (!game.paused) {
+      if (game.mode === STATE.BANNER && now >= game.bannerUntil) {
+        afterBanner();
+      } else if (game.mode === STATE.BETWEEN && now >= game.betweenUntil) {
+        if (game.dayPoint >= 3) endWorkday();
+        else beginRally();
+      } else if (game.mode === STATE.VOID && now >= game.voidUntil) {
+        returnToWork();
+      } else if (game.mode === STATE.PLAY) {
+        updatePlayer(dt);
+        updateSystem(now, dt);
+        updateMoney(dt);
+      } else if (game.mode === STATE.EXIT) {
+        updatePlayer(dt);
+        updateExit();
+      }
+    }
+
+    render();
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- input ----------
+  function setPaused(p) {
+    if (game.mode === STATE.MENU) return;
+    game.paused = p;
+  }
+
+  window.addEventListener('keydown', (e) => {
+    keys[e.key] = true;
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+      e.preventDefault();
+    }
+  });
+  window.addEventListener('keyup', (e) => {
+    keys[e.key] = false;
+  });
+
+  function canvasPos(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleY = H / rect.height;
+    const scaleX = W / rect.width;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+    };
+  }
+
+  canvas.addEventListener('mousedown', (e) => {
+    const p = canvasPos(e.clientX, e.clientY);
+    if (game.mode === STATE.MENU) {
+      const b = game._startBtn;
+      if (b && p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h) {
+        canvas.classList.remove('menu');
+        startSession();
+      }
+      return;
+    }
+    pointerActive = true;
+    pointerY = p.y;
+  });
+  window.addEventListener('mouseup', () => {
+    pointerActive = false;
+  });
+  canvas.addEventListener('mousemove', (e) => {
+    if (!pointerActive) return;
+    pointerY = canvasPos(e.clientX, e.clientY).y;
+  });
+
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    touchId = t.identifier;
+    const p = canvasPos(t.clientX, t.clientY);
+    if (game.mode === STATE.MENU) {
+      const b = game._startBtn;
+      if (b && p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h) {
+        canvas.classList.remove('menu');
+        startSession();
+      }
+      return;
+    }
+    pointerActive = true;
+    pointerY = p.y;
+    if (game.mode === STATE.EXIT) {
+      game.player.x = clamp(p.x, 20, W - 20);
+      game.player.y = clamp(p.y, 40, H - 20);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier !== touchId) continue;
+      const p = canvasPos(t.clientX, t.clientY);
+      pointerY = p.y;
+      if (game.mode === STATE.EXIT) {
+        game.player.x = clamp(p.x, 20, W - 20);
+        game.player.y = clamp(p.y, 40, H - 20);
+      }
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', (e) => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === touchId) {
+        pointerActive = false;
+        touchId = null;
+      }
+    }
+  });
+
+  window.addEventListener('blur', () => setPaused(true));
+  window.addEventListener('focus', () => setPaused(false));
+  document.addEventListener('visibilitychange', () => {
+    setPaused(document.hidden);
+  });
+
+  window.addEventListener('message', (event) => {
+    const data = event.data || {};
+    if (data.type === 'rrr-pause') setPaused(true);
+    if (data.type === 'rrr-resume') setPaused(false);
+  });
+
+  requestAnimationFrame(frame);
+})();
+  </script>
+</body>
+</html>

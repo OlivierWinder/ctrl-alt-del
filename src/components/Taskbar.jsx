@@ -3,17 +3,14 @@ import { useClock } from '../hooks/useClock';
 import { getWindowMeta } from '../utils/getWindowMeta';
 import { assetUrl } from '../utils/assetUrl';
 
-const PLACEHOLDER_ITEMS = [
-  { id: 'programs', label: 'Programs', hasSubmenu: true },
-  { id: 'favorites', label: 'Favorites', hasSubmenu: true },
-  { id: 'documents', label: 'Documents', hasSubmenu: true },
-  { id: 'settings', label: 'Settings', hasSubmenu: true },
-  { id: 'find', label: 'Find', hasSubmenu: true },
-  { id: 'help', label: 'Help', hasSubmenu: false },
-  { id: 'run', label: 'Run...', hasSubmenu: false },
-];
-
-export default function Taskbar({ windows, focusedId, onTaskbarClick, onLogOff }) {
+export default function Taskbar({
+  windows,
+  focusedId,
+  onTaskbarClick,
+  onLogOff,
+  onOpenSystemScreen,
+  onOpenCredits,
+}) {
   const time = useClock();
   const [isStartOpen, setIsStartOpen] = useState(false);
   const startAreaRef = useRef(null);
@@ -59,25 +56,56 @@ export default function Taskbar({ windows, focusedId, onTaskbarClick, onLogOff }
             <div className="start-menu__sidebar" aria-hidden="true" />
 
             <div className="start-menu__list">
-              {PLACEHOLDER_ITEMS.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className="start-menu__item start-menu__item--placeholder"
-                  role="menuitem"
-                  disabled
-                >
-                  <img
-                    src={assetUrl('/RESOURCES/folder.png')}
-                    alt=""
-                    className="start-menu__item-icon"
-                  />
-                  <span className="start-menu__item-label">{item.label}</span>
-                  {item.hasSubmenu && (
-                    <span className="start-menu__item-arrow" aria-hidden="true" />
-                  )}
-                </button>
-              ))}
+              <button
+                type="button"
+                className="start-menu__item"
+                role="menuitem"
+                onClick={() => {
+                  setIsStartOpen(false);
+                  onOpenSystemScreen?.('system_information');
+                }}
+              >
+                <img
+                  src={assetUrl('/RESOURCES/internet_icon.png')}
+                  alt=""
+                  className="start-menu__item-icon"
+                />
+                <span className="start-menu__item-label">System Information</span>
+              </button>
+
+              <button
+                type="button"
+                className="start-menu__item"
+                role="menuitem"
+                onClick={() => {
+                  setIsStartOpen(false);
+                  onOpenSystemScreen?.('profile');
+                }}
+              >
+                <img
+                  src={assetUrl('/RESOURCES/notes_icon.png')}
+                  alt=""
+                  className="start-menu__item-icon"
+                />
+                <span className="start-menu__item-label">Profile</span>
+              </button>
+
+              <button
+                type="button"
+                className="start-menu__item"
+                role="menuitem"
+                onClick={() => {
+                  setIsStartOpen(false);
+                  onOpenCredits?.();
+                }}
+              >
+                <img
+                  src={assetUrl('/RESOURCES/notes_icon.png')}
+                  alt=""
+                  className="start-menu__item-icon"
+                />
+                <span className="start-menu__item-label">Credits</span>
+              </button>
 
               <div className="start-menu__separator" role="separator" />
 

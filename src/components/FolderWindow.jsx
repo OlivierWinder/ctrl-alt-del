@@ -180,6 +180,13 @@ export default function FolderWindow({
               >
                 {item.pdf ? (
                   <PdfThumbIcon pdfSrc={item.pdf} />
+                ) : item.image ? (
+                  <img
+                    src={assetUrl(item.image)}
+                    alt=""
+                    className="image-thumb-icon"
+                    draggable={false}
+                  />
                 ) : (
                   <img src={assetUrl(item.icon)} alt="" />
                 )}

@@ -33,6 +33,9 @@ export default function Window({
     variant === 'notes' ? 'window--notes' : '',
     variant === 'email' ? 'window--email' : '',
     variant === 'email-reply' ? 'window--email-reply' : '',
+    variant === 'credits' ? 'window--credits' : '',
+    variant === 'ratrace' ? 'window--ratrace' : '',
+    variant === 'listen' ? 'window--listen' : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -44,7 +47,10 @@ export default function Window({
     || variant === 'notes'
     || variant === 'cdplayer'
     || variant === 'email'
-    || variant === 'email-reply';
+    || variant === 'email-reply'
+    || variant === 'credits'
+    || variant === 'ratrace'
+    || variant === 'listen';
 
   const style = {
     display: isFlexColumn ? 'flex' : 'block',

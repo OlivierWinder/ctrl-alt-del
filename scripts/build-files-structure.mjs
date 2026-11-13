@@ -1,119 +1,105 @@
-import { readdirSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
-import { dirname, join } from 'path';
+import { readdirSync, readFileSync, writeFileSync, statSync } from 'fs';
+import { dirname, join, relative } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const CSV_PATH = join(__dirname, 'FILES - Blad1.csv');
+const CSV_PATH = join(__dirname, 'CTRL-ALT-DEL-bestanden.csv');
 const FILES_DIR = join(__dirname, '../public/RESOURCES/files');
 const OUTPUT_PATH = join(__dirname, '../src/data/filesStructure.js');
 
 const FOLDER_ICON = '/RESOURCES/folder.png';
-const CD_AUDIO_ICON = '/RESOURCES/cd_audio.png';
-const EP_COVER_ICON = '/RESOURCES/ep_cover.jpg';
 const IMAGE_FILE_ICON = '/RESOURCES/image_file.png';
-const FILE_EXTENSIONS = /\.(jpe?g|png|pdf|mp3|dmg|wav|gif|txt|doc|mp4|mov)$/i;
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|gif|webp)$/i;
-const AUDIO_EXTENSIONS = /\.(mp3|wav)$/i;
-
-/** CSV label → actual filename on disk when names differ */
-const FILE_ALIASES = {
-  'coverart_ver2.jpg': 'coverart_ver2.jpeg',
-  'coverart_ver3.jpg': 'coverart_ver3.jpeg',
-  'tiger love.jpg': 'tiger love.jpeg',
-  'patrick star hoverboard.jpg': 'patrick star hoverboard.jpeg',
-  'coverart_ver4.jpg': 'coverart_ver4.jpeg',
-  'coverart_ver5.jpg': 'coverart_ver5.jpeg',
-  'coverart_ver6s.jpg': 'coverart_ver6.jpeg',
-  'aa59b6bd5b8f83bb39a0211d6c1c65cb.jpg': 'aa59b6bd5b8f83bb39a0211d6c1c65cb.jpeg',
-  'cd.jpg': 'cd.jpeg',
-  'LILĒ.pdf': 'LILĒ.pdf',
-  'LILE.pdf': 'LILĒ.pdf',
-};
+const PDF_EXTENSIONS = /\.pdf$/i;
 
 function slugify(value) {
   return value
     .toLowerCase()
+    .replace(/</g, 'lt')
+    .replace(/>/g, 'gt')
     .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_|_$/g, '');
+    .replace(/^_|_$/g, '') || 'folder';
 }
 
 function normalizeKey(name) {
   return name.normalize('NFC').toLowerCase();
 }
 
-function stemKey(name) {
-  return normalizeKey(name).replace(/\.[^.]+$/, '');
+function displayTitle(name) {
+  return name;
 }
 
-function isFile(name) {
-  return FILE_EXTENSIONS.test(name.trim());
+function publicPath(relativePath) {
+  // Keep raw path segments; assetUrl() encodes them for the browser.
+  return `/RESOURCES/files/${relativePath.split('\\').join('/')}`;
 }
 
-function buildDiskIndex() {
+function walkDisk(dir, prefix = '') {
   const byExact = new Map();
   const byStem = new Map();
 
-  for (const name of readdirSync(FILES_DIR)) {
-    byExact.set(normalizeKey(name), name);
-    const stem = stemKey(name);
-    if (!byStem.has(stem)) byStem.set(stem, name);
+  for (const name of readdirSync(dir)) {
+    if (name.startsWith('.')) continue;
+    const full = join(dir, name);
+    const rel = prefix ? `${prefix}/${name}` : name;
+    const stats = statSync(full);
+
+    if (stats.isDirectory()) {
+      const nested = walkDisk(full, rel);
+      for (const [key, value] of nested.byExact) byExact.set(key, value);
+      for (const [key, value] of nested.byStem) {
+        if (!byStem.has(key)) byStem.set(key, value);
+      }
+      continue;
+    }
+
+    byExact.set(normalizeKey(rel), rel);
+    byExact.set(normalizeKey(name), rel);
+    const stem = normalizeKey(name).replace(/\.[^.]+$/, '');
+    if (!byStem.has(stem)) byStem.set(stem, rel);
   }
 
   return { byExact, byStem };
 }
 
-function resolveDiskName(label, diskIndex) {
-  if (FILE_ALIASES[label]) {
-    const found = diskIndex.byExact.get(normalizeKey(FILE_ALIASES[label]));
+function resolveDiskPath(label, folder, diskIndex) {
+  const candidates = [];
+  if (folder) candidates.push(`${folder}/${label}`);
+  candidates.push(label);
+
+  for (const candidate of candidates) {
+    const found = diskIndex.byExact.get(normalizeKey(candidate));
     if (found) return found;
   }
 
-  const exact = diskIndex.byExact.get(normalizeKey(label));
-  if (exact) return exact;
-
-  const stem = diskIndex.byStem.get(stemKey(label));
-  if (stem) return stem;
+  const stem = normalizeKey(label).replace(/\.[^.]+$/, '');
+  const byStem = diskIndex.byStem.get(stem);
+  if (byStem) return byStem;
 
   const swapped = label.replace(/\.jpg$/i, '.jpeg').replace(/\.jpeg$/i, '.jpg');
   if (swapped !== label) {
-    const swappedExact = diskIndex.byExact.get(normalizeKey(swapped));
-    if (swappedExact) return swappedExact;
+    for (const candidate of [folder ? `${folder}/${swapped}` : null, swapped].filter(Boolean)) {
+      const found = diskIndex.byExact.get(normalizeKey(candidate));
+      if (found) return found;
+    }
   }
 
   return null;
 }
 
-function publicPath(diskName) {
-  return `/RESOURCES/files/${encodeURIComponent(diskName).replace(/%2F/gi, '/')}`;
-}
-
-function makeFileItem(label, diskIndex, { isFirstEpDemo = false, useEpCover = false } = {}) {
+function makeFileItem(label, folder, diskIndex) {
   const item = { label, icon: FOLDER_ICON };
+  const diskPath = resolveDiskPath(label, folder, diskIndex);
+  if (!diskPath) return item;
 
-  // Fake installer — opens the rat race error dialog, no real file needed
-  if (normalizeKey(label) === 'ratracerevolution.dmg') {
-    item.errorAction = 'rat_race_revolution';
-    return item;
-  }
+  const path = publicPath(diskPath);
+  const lower = diskPath.toLowerCase();
 
-  const diskName = resolveDiskName(label, diskIndex);
-
-  if (!diskName) return item;
-
-  const path = publicPath(diskName);
-  const lower = diskName.toLowerCase();
-
-  if (lower.endsWith('.pdf')) {
+  if (PDF_EXTENSIONS.test(lower)) {
     item.pdf = path;
   } else if (IMAGE_EXTENSIONS.test(lower)) {
     item.icon = IMAGE_FILE_ICON;
     item.image = path;
-  } else if (AUDIO_EXTENSIONS.test(lower)) {
-    item.icon = CD_AUDIO_ICON;
-    item.audio = path;
-    item.opens = 'cd_player';
-    if (useEpCover) item.cover = EP_COVER_ICON;
-    if (isFirstEpDemo) item.autoplay = true;
   }
 
   return item;
@@ -123,156 +109,81 @@ function makeFolderItem(label, id) {
   return { label, icon: FOLDER_ICON, opens: id };
 }
 
-function ensureTop(name, topLevelFolders) {
-  if (!topLevelFolders.has(name)) {
-    topLevelFolders.set(name, { subfolders: new Map(), files: [], order: [] });
-  }
-  return topLevelFolders.get(name);
-}
+function splitCsvLine(line) {
+  const cells = [];
+  let current = '';
+  let inQuotes = false;
 
-function ensureSub(bucket, name) {
-  if (!bucket.subfolders.has(name)) {
-    bucket.subfolders.set(name, []);
-    bucket.order.push({ type: 'sub', name });
-  }
-  return bucket.subfolders.get(name);
-}
-
-function addTopFile(bucket, label) {
-  bucket.files.push(label);
-  bucket.order.push({ type: 'file', name: label });
-}
-
-function parseCsv(text) {
-  const lines = text.trim().split(/\r?\n/);
-  const topLevelFolders = new Map();
-  let currentTop = null;
-  let currentSub = null;
-
-  function splitRow(line) {
-    const first = line.indexOf(',');
-    if (first === -1) {
-      return [line.trim(), '', ''];
-    }
-
-    const cell1 = line.slice(0, first).trim();
-    const rest = line.slice(first + 1);
-    const second = rest.indexOf(',');
-
-    if (second === -1) {
-      return [cell1, rest.trim(), ''];
-    }
-
-    return [
-      cell1,
-      rest.slice(0, second).trim(),
-      rest.slice(second + 1).trim().replace(/,$/, ''),
-    ];
-  }
-
-  for (const line of lines) {
-    if (!line.trim()) continue;
-
-    const [cell1, cell2, cell3] = splitRow(line);
-
-    if (cell1) {
-      currentTop = cell1;
-      currentSub = null;
-      const bucket = ensureTop(currentTop, topLevelFolders);
-
-      if (!cell2) continue;
-
-      if (isFile(cell2)) {
-        addTopFile(bucket, cell2);
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i];
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i += 1;
       } else {
-        currentSub = cell2;
-        const subFiles = ensureSub(bucket, currentSub);
-        if (cell3 && isFile(cell3)) subFiles.push(cell3);
+        inQuotes = !inQuotes;
       }
       continue;
     }
-
-    if (!currentTop) continue;
-    const bucket = ensureTop(currentTop, topLevelFolders);
-
-    // ,,file → current subfolder
-    if (!cell2 && cell3 && isFile(cell3)) {
-      if (currentSub) ensureSub(bucket, currentSub).push(cell3);
+    if (char === ',' && !inQuotes) {
+      cells.push(current.trim());
+      current = '';
       continue;
     }
+    current += char;
+  }
+  cells.push(current.trim());
+  return cells;
+}
 
-    if (!cell2) continue;
+function parseCsv(text) {
+  const lines = text.replace(/^\uFEFF/, '').trim().split(/\r?\n/);
+  const folders = new Map();
 
-    // ,SUB or ,SUB,file → start / switch subfolder
-    if (!isFile(cell2)) {
-      currentSub = cell2;
-      const subFiles = ensureSub(bucket, currentSub);
-      if (cell3 && isFile(cell3)) subFiles.push(cell3);
-      continue;
-    }
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i].trim();
+    if (!line) continue;
 
-    // ,file → top-level file (leaves subfolder context)
-    currentSub = null;
-    addTopFile(bucket, cell2);
+    const cells = splitCsvLine(line);
+    const [bestandsnaam, padOfUrl, type, map] = cells;
+
+    if (i === 0 && /bestandsnaam/i.test(bestandsnaam)) continue;
+    if (!bestandsnaam || !map) continue;
+
+    if (!folders.has(map)) folders.set(map, []);
+    folders.get(map).push({
+      label: bestandsnaam,
+      pathHint: padOfUrl || '',
+      type: type || '',
+    });
   }
 
-  return topLevelFolders;
+  return folders;
 }
 
-function displayTitle(name) {
-  if (name === 'DOWNLOADS') return 'Downloads';
-  if (name === 'RECENTS') return 'Recents';
-  return name;
-}
-
-function topFolderId(name) {
-  if (name === 'Documents') return 'files_documents';
+function folderId(name) {
   return slugify(name);
 }
 
-function buildFolderWindows(topLevelFolders, diskIndex) {
+function buildFolderWindows(folders, diskIndex) {
   const folderWindows = {};
   const rootItems = [];
   const missing = [];
 
-  function fileItems(labels, options = {}) {
-    return labels.map((label, index) => {
-      const item = makeFileItem(label, diskIndex, {
-        isFirstEpDemo: Boolean(options.epDemos && index === 0),
-        useEpCover: Boolean(options.epDemos),
-      });
-      if (!item.pdf && !item.image && !item.audio && !item.errorAction) missing.push(label);
+  for (const [folderName, files] of folders.entries()) {
+    const id = folderId(folderName);
+    rootItems.push(makeFolderItem(displayTitle(folderName), id));
+
+    const items = files.map((file) => {
+      const item = makeFileItem(file.label, folderName, diskIndex);
+      if (!item.pdf && !item.image) missing.push(`${folderName}/${file.label}`);
       return item;
     });
-  }
 
-  for (const [topName, bucket] of topLevelFolders.entries()) {
-    const topId = topFolderId(topName);
-    rootItems.push(makeFolderItem(displayTitle(topName), topId));
-
-    const topItems = [];
-
-    for (const entry of bucket.order) {
-      if (entry.type === 'file') {
-        topItems.push(...fileItems([entry.name]));
-        continue;
-      }
-
-      const subName = entry.name;
-      const subFiles = bucket.subfolders.get(subName) || [];
-      const subId = slugify(`${topName}_${subName}`);
-      folderWindows[subId] = {
-        title: subName,
-        address: subName,
-        items: fileItems(subFiles, { epDemos: subName === 'EP' }),
-      };
-      topItems.push(makeFolderItem(subName, subId));
-    }
-
-    folderWindows[topId] = {
-      title: displayTitle(topName),
-      address: displayTitle(topName),
-      items: topItems,
+    folderWindows[id] = {
+      title: displayTitle(folderName),
+      address: displayTitle(folderName),
+      items,
     };
   }
 
@@ -285,44 +196,12 @@ function buildFolderWindows(topLevelFolders, diskIndex) {
   return { folderWindows, missing };
 }
 
-function collectLabels(topLevelFolders) {
-  const labels = new Set();
-
-  for (const bucket of topLevelFolders.values()) {
-    for (const label of bucket.files) labels.add(label);
-    for (const subFiles of bucket.subfolders.values()) {
-      for (const label of subFiles) labels.add(label);
-    }
-  }
-
-  return labels;
-}
-
-function cleanupOrphans(topLevelFolders, diskIndex) {
-  const keep = new Set();
-
-  for (const label of collectLabels(topLevelFolders)) {
-    const diskName = resolveDiskName(label, diskIndex);
-    if (diskName) keep.add(normalizeKey(diskName));
-  }
-
-  for (const name of readdirSync(FILES_DIR)) {
-    if (name.startsWith('.')) continue;
-    if (!keep.has(normalizeKey(name))) {
-      unlinkSync(join(FILES_DIR, name));
-      console.log('Removed orphan:', name);
-    }
-  }
-}
-
 const csv = readFileSync(CSV_PATH, 'utf8');
-const topLevelFolders = parseCsv(csv);
-let diskIndex = buildDiskIndex();
-cleanupOrphans(topLevelFolders, diskIndex);
-diskIndex = buildDiskIndex();
-const { folderWindows, missing } = buildFolderWindows(topLevelFolders, diskIndex);
+const folders = parseCsv(csv);
+const diskIndex = walkDisk(FILES_DIR);
+const { folderWindows, missing } = buildFolderWindows(folders, diskIndex);
 
-const output = `// Auto-generated from FILES - Blad1.csv — do not edit by hand.
+const output = `// Auto-generated from CTRL-ALT-DEL-bestanden.csv — do not edit by hand.
 // Regenerate: node scripts/build-files-structure.mjs
 
 export const folderWindows = ${JSON.stringify(folderWindows, null, 2)
@@ -332,7 +211,10 @@ export const folderWindows = ${JSON.stringify(folderWindows, null, 2)
 
 writeFileSync(OUTPUT_PATH, output);
 console.log('Generated', OUTPUT_PATH);
+console.log('Folders:', [...folders.keys()].join(', '));
 if (missing.length) {
   console.log('Missing assets (listed but not openable):');
   for (const name of [...new Set(missing)]) console.log(' -', name);
+} else {
+  console.log('All CSV assets resolved.');
 }

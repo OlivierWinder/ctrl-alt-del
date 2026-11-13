@@ -12,8 +12,13 @@ import VirusVideo from './VirusVideo';
 import FakeAdOverlay from './FakeAdOverlay';
 import AdDictionPrompt from './AdDictionPrompt';
 import AdDictionWindow from './AdDictionWindow';
+import SystemBlueScreen from './SystemBlueScreen';
+import CreditsWindow from './CreditsWindow';
+import RatRaceWindow from './RatRaceWindow';
+import ListenWindow from './ListenWindow';
 import Taskbar from './Taskbar';
 import { desktopIcons, folderWindows } from '../data/content';
+import { getListenTrack } from '../data/listenStructure';
 import { useWindowManager } from '../hooks/useWindowManager';
 import { useErrorTriggers, triggerErrorAction } from '../hooks/useErrorTriggers';
 import { useFakeAds } from '../hooks/useFakeAds';
@@ -50,6 +55,7 @@ function getIconPositions() {
 export default function Desktop({ isActive = true }) {
   const desktopRef = useRef(null);
   const [selectedIconId, setSelectedIconId] = useState(null);
+  const [systemScreenId, setSystemScreenId] = useState(null);
   const {
     windows,
     focusedId,
@@ -139,12 +145,12 @@ export default function Desktop({ isActive = true }) {
     }
 
     if (id === 'rat_race_revolution') {
-      triggerErrorAction(openErrorDialog, id);
+      openWindow('rat_race_revolution');
       return;
     }
 
     if (id === 'listen') {
-      navigateFolder('demos_ep', ['FILES', 'DEMOS', 'EP']);
+      openWindow('listen');
       return;
     }
 
@@ -221,7 +227,7 @@ export default function Desktop({ isActive = true }) {
         ))}
 
         {windows.map((win) => {
-          if (win.minimized) return null;
+          if (win.minimized && win.type !== 'rat_race') return null;
 
           const shared = {
             key: win.instanceId,
@@ -231,6 +237,16 @@ export default function Desktop({ isActive = true }) {
             onClose: () => closeWindow(win.instanceId),
             onFocus: () => focusWindow(win.instanceId),
           };
+
+          if (win.type === 'rat_race') {
+            return (
+              <RatRaceWindow
+                {...shared}
+                title={win.title}
+                minimized={Boolean(win.minimized)}
+              />
+            );
+          }
 
           if (win.type === 'folder') {
             const config = folderWindows[win.appId];
@@ -286,6 +302,29 @@ export default function Desktop({ isActive = true }) {
               <NotesApp
                 {...shared}
                 title={win.title}
+              />
+            );
+          }
+
+          if (win.type === 'credits') {
+            return (
+              <CreditsWindow
+                {...shared}
+                title={win.title}
+              />
+            );
+          }
+
+          if (win.type === 'listen') {
+            return (
+              <ListenWindow
+                {...shared}
+                title={win.title}
+                onPlayTrack={(trackId) => {
+                  const track = getListenTrack(trackId);
+                  if (!track) return;
+                  openAudioView(track, { autoplay: true });
+                }}
               />
             );
           }
@@ -374,6 +413,13 @@ export default function Desktop({ isActive = true }) {
         focusedId={focusedId}
         onTaskbarClick={toggleMinimize}
         onLogOff={() => triggerErrorAction(openErrorDialog, 'log_off')}
+        onOpenSystemScreen={setSystemScreenId}
+        onOpenCredits={() => openWindow('credits')}
+      />
+
+      <SystemBlueScreen
+        screenId={systemScreenId}
+        onClose={() => setSystemScreenId(null)}
       />
     </>
   );

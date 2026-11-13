@@ -1,6 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { folderWindows } from '../data/filesStructure';
-import { emailApp, notesApp, pdfWindows, simpleWindows } from '../data/content';
+import { emailApp, folderWindows, notesApp, pdfWindows, simpleWindows } from '../data/content';
 
 function createFolderNav(windowId, path) {
   return {
@@ -256,6 +255,9 @@ export function useWindowManager() {
         && (
           win.type === 'simple'
           || win.type === 'notes'
+          || win.type === 'credits'
+          || win.type === 'listen'
+          || win.type === 'rat_race'
           || win.type === 'email'
           || win.type === 'ai'
           || (win.type === 'pdf' && pdfWindows[appId])
@@ -293,6 +295,24 @@ export function useWindowManager() {
           ...nextWin,
           type: 'notes',
           title: notesApp.title || 'NOTES',
+        };
+      } else if (appId === 'credits') {
+        nextWin = {
+          ...nextWin,
+          type: 'credits',
+          title: 'Credits',
+        };
+      } else if (appId === 'listen') {
+        nextWin = {
+          ...nextWin,
+          type: 'listen',
+          title: 'Listen',
+        };
+      } else if (appId === 'rat_race_revolution') {
+        nextWin = {
+          ...nextWin,
+          type: 'rat_race',
+          title: 'RatRaceRevolution',
         };
       } else if (appId === 'email') {
         nextWin = {
