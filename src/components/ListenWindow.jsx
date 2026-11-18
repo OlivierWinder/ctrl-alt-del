@@ -47,13 +47,28 @@ export default function ListenWindow({
               type="button"
               className="listen-window__track"
               role="listitem"
-              onClick={() => onPlayTrack?.(track.id)}
+              onDoubleClick={() => onPlayTrack?.(track.id)}
             >
               <span className="listen-window__col-num">{index + 1}</span>
               <span className="listen-window__col-track">{track.label}</span>
             </button>
           ))}
         </div>
+
+        <button
+          type="button"
+          className="listen-window__playlist-btn"
+          onClick={() =>
+            window.open(
+              'https://open.spotify.com/album/7uk1aaKzZp5c3qsKmWKy73?si=GCWwhVivQ2u26sNnRE0NWw',
+              '_blank',
+              'noopener,noreferrer'
+            )
+          }
+        >
+          Add to playlist
+          <span className="listen-window__playlist-plus" aria-hidden="true">+</span>
+        </button>
       </div>
     </Window>
   );

@@ -9,9 +9,32 @@ function createFolderNav(windowId, path) {
   };
 }
 
+// Popup layer (ads / errors / ad-detected) stays below priority media apps.
+const POPUP_Z_MIN = 1000;
+const POPUP_Z_MAX = 7999;
+const NORMAL_Z_MIN = 8000;
+const NORMAL_Z_MAX = 19999;
+const PRIORITY_Z_MIN = 20000;
+
+function isPopupWindow(win) {
+  return win?.type === 'error' || win?.type === 'ad_diction';
+}
+
+function isPriorityWindow(win) {
+  return (
+    win?.type === 'listen'
+    || win?.type === 'rat_race'
+    || win?.type === 'cd_player'
+    || win?.type === 'ai'
+    || win?.appId === 'cd_rom'
+  );
+}
+
 export function useWindowManager() {
   const nextIdRef = useRef(1);
-  const nextZRef = useRef(600);
+  const nextPopupZRef = useRef(POPUP_Z_MIN);
+  const nextZRef = useRef(NORMAL_Z_MIN);
+  const nextPriorityZRef = useRef(PRIORITY_Z_MIN);
   const shownErrorsRef = useRef(new Set());
   const [windows, setWindows] = useState([]);
   const [focusedId, setFocusedId] = useState(null);
@@ -22,17 +45,34 @@ export function useWindowManager() {
     return id;
   }, []);
 
-  // Single rising stack so any focused window (apps, errors, ads) can sit on top.
+  const allocPopupZ = useCallback(() => {
+    nextPopupZRef.current += 1;
+    if (nextPopupZRef.current > POPUP_Z_MAX) nextPopupZRef.current = POPUP_Z_MIN + 1;
+    return nextPopupZRef.current;
+  }, []);
+
   const allocZ = useCallback(() => {
     nextZRef.current += 1;
+    if (nextZRef.current > NORMAL_Z_MAX) nextZRef.current = NORMAL_Z_MIN + 1;
     return nextZRef.current;
   }, []);
+
+  const allocPriorityZ = useCallback(() => {
+    nextPriorityZRef.current += 1;
+    return nextPriorityZRef.current;
+  }, []);
+
+  const allocForWindow = useCallback((win) => {
+    if (isPopupWindow(win)) return allocPopupZ();
+    if (isPriorityWindow(win)) return allocPriorityZ();
+    return allocZ();
+  }, [allocPopupZ, allocPriorityZ, allocZ]);
 
   const focusWindow = useCallback((instanceId) => {
     setWindows((current) => {
       const target = current.find((win) => win.instanceId === instanceId);
       if (!target) return current;
-      const zIndex = allocZ();
+      const zIndex = allocForWindow(target);
       return current.map((win) => (
         win.instanceId === instanceId
           ? { ...win, zIndex, minimized: false }
@@ -40,7 +80,7 @@ export function useWindowManager() {
       ));
     });
     setFocusedId(instanceId);
-  }, [allocZ]);
+  }, [allocForWindow]);
 
   const closeWindow = useCallback((instanceId) => {
     setWindows((current) => {
@@ -59,7 +99,7 @@ export function useWindowManager() {
       setWindows((current) => {
         const target = current.find((win) => win.instanceId === instanceId);
         if (!target) return current;
-        const nextZ = allocZ();
+        const nextZ = allocForWindow(target);
 
         if (target.minimized) {
           return current.map((win) => (
@@ -84,7 +124,7 @@ export function useWindowManager() {
 
       return instanceId;
     });
-  }, [allocZ]);
+  }, [allocForWindow]);
 
   const openImageView = useCallback((title, image) => {
     const instanceId = allocId();
@@ -125,31 +165,50 @@ export function useWindowManager() {
   }, [allocId, allocZ]);
 
   const openAudioView = useCallback((track, options = {}) => {
-    const instanceId = allocId();
-    const zIndex = allocZ();
-    setWindows((current) => [
-      ...current,
-      {
-        instanceId,
-        type: 'cd_player',
-        appId: 'cd_player',
-        title: 'CD Player',
-        track,
-        autoplay: options.autoplay !== false,
-        zIndex,
-        stackIndex: current.length,
-        minimized: false,
-      },
-    ]);
-    setFocusedId(instanceId);
-  }, [allocId, allocZ]);
+    const zIndex = allocPriorityZ();
+    setWindows((current) => {
+      const existing = current.find((win) => win.type === 'cd_player');
+      const withoutPlayers = current.filter((win) => win.type !== 'cd_player');
+
+      if (existing) {
+        setFocusedId(existing.instanceId);
+        return [
+          ...withoutPlayers,
+          {
+            ...existing,
+            track,
+            autoplay: options.autoplay !== false,
+            zIndex,
+            minimized: false,
+          },
+        ];
+      }
+
+      const instanceId = allocId();
+      setFocusedId(instanceId);
+      return [
+        ...withoutPlayers,
+        {
+          instanceId,
+          type: 'cd_player',
+          appId: 'cd_player',
+          title: 'CD Player',
+          track,
+          autoplay: options.autoplay !== false,
+          zIndex,
+          stackIndex: current.length,
+          minimized: false,
+        },
+      ];
+    });
+  }, [allocId, allocPriorityZ]);
 
   const openAdDictionWindow = useCallback(({ adsShownCount = 0, attentionEuros = 0 } = {}) => {
     setWindows((current) => {
       const existing = current.find((win) => win.type === 'ad_diction');
 
       if (existing) {
-        const zIndex = allocZ();
+        const zIndex = allocPopupZ();
         setFocusedId(existing.instanceId);
         return current.map((win) => (
           win.instanceId === existing.instanceId
@@ -165,7 +224,7 @@ export function useWindowManager() {
       }
 
       const instanceId = allocId();
-      const zIndex = allocZ();
+      const zIndex = allocPopupZ();
       setFocusedId(instanceId);
       return [
         ...current,
@@ -182,7 +241,7 @@ export function useWindowManager() {
         },
       ];
     });
-  }, [allocId, allocZ]);
+  }, [allocId, allocPopupZ]);
 
   const closeAdDictionWindow = useCallback(() => {
     setWindows((current) => {
@@ -205,7 +264,7 @@ export function useWindowManager() {
       const existing = current.find((win) => win.type === 'error' && win.appId === error.id);
 
       if (existing) {
-        const zIndex = allocZ();
+        const zIndex = allocPopupZ();
         setFocusedId(existing.instanceId);
         return current.map((win) => (
           win.instanceId === existing.instanceId
@@ -224,7 +283,7 @@ export function useWindowManager() {
       }
 
       const instanceId = allocId();
-      const zIndex = allocZ();
+      const zIndex = allocPopupZ();
       setFocusedId(instanceId);
       return [
         ...current,
@@ -246,7 +305,7 @@ export function useWindowManager() {
 
     if (error.once) shownErrorsRef.current.add(error.id);
     return true;
-  }, [allocId, allocZ]);
+  }, [allocId, allocPopupZ]);
 
   const openWindow = useCallback((appId) => {
     setWindows((current) => {
@@ -265,7 +324,7 @@ export function useWindowManager() {
       ));
 
       if (reusable) {
-        const zIndex = allocZ();
+        const zIndex = allocForWindow(reusable);
         setFocusedId(reusable.instanceId);
         return current.map((win) => (
           win.instanceId === reusable.instanceId
@@ -275,13 +334,12 @@ export function useWindowManager() {
       }
 
       const instanceId = allocId();
-      const zIndex = allocZ();
       setFocusedId(instanceId);
 
       let nextWin = {
         instanceId,
         appId,
-        zIndex,
+        zIndex: 0,
         stackIndex: current.length,
         minimized: false,
         title: appId,
@@ -343,9 +401,10 @@ export function useWindowManager() {
         };
       }
 
+      nextWin = { ...nextWin, zIndex: allocForWindow(nextWin) };
       return [...current, nextWin];
     });
-  }, [allocId, allocZ]);
+  }, [allocId, allocForWindow]);
 
   const navigateFolder = useCallback((folderId, path, _options = {}, sourceInstanceId = null) => {
     setWindows((current) => {
@@ -447,6 +506,6 @@ export function useWindowManager() {
     closeWindow,
     focusWindow,
     toggleMinimize,
-    allocateZIndex: allocZ,
+    allocatePopupZIndex: allocPopupZ,
   };
 }

@@ -72,7 +72,7 @@ export default function Desktop({ isActive = true }) {
     closeWindow,
     focusWindow,
     toggleMinimize,
-    allocateZIndex,
+    allocatePopupZIndex,
   } = useWindowManager();
 
   useErrorTriggers(openErrorDialog, isActive);
@@ -95,8 +95,8 @@ export default function Desktop({ isActive = true }) {
       setAdZIndex(0);
       return;
     }
-    setAdZIndex(allocateZIndex());
-  }, [currentAd, allocateZIndex]);
+    setAdZIndex(allocatePopupZIndex());
+  }, [currentAd, allocatePopupZIndex]);
 
   const iconPositions = useMemo(() => getIconPositions(), []);
 
@@ -211,6 +211,186 @@ export default function Desktop({ isActive = true }) {
 
   const aiWindow = windows.find((win) => win.type === 'ai' && !win.minimized);
 
+  function isPriorityDesktopWindow(win) {
+    return (
+      win.type === 'listen'
+      || win.type === 'rat_race'
+      || win.type === 'cd_player'
+      || win.type === 'ai'
+      || win.appId === 'cd_rom'
+    );
+  }
+
+  function isPopupDesktopWindow(win) {
+    return win.type === 'error' || win.type === 'ad_diction';
+  }
+
+  function renderDesktopWindow(win) {
+    if (win.minimized && win.type !== 'rat_race') return null;
+
+    const shared = {
+      key: win.instanceId,
+      zIndex: win.zIndex,
+      containerRef: desktopRef,
+      stackOffset: win.stackIndex,
+      onClose: () => closeWindow(win.instanceId),
+      onFocus: () => focusWindow(win.instanceId),
+    };
+
+    if (win.type === 'rat_race') {
+      return (
+        <RatRaceWindow
+          {...shared}
+          title={win.title}
+          minimized={Boolean(win.minimized)}
+        />
+      );
+    }
+
+    if (win.type === 'folder') {
+      const config = folderWindows[win.appId];
+      if (!config) return null;
+      const nav = win.folderNav;
+      return (
+        <FolderWindow
+          {...shared}
+          config={config}
+          folderPath={nav.path}
+          canGoBack={nav.index > 0}
+          canGoForward={nav.index < nav.history.length - 1}
+          onBack={() => folderBack(win.instanceId)}
+          onForward={() => folderForward(win.instanceId)}
+          onOpenItem={(item) => handleOpenFolderItem(item, win.instanceId)}
+        />
+      );
+    }
+
+    if (win.type === 'image') {
+      return (
+        <ImageViewer
+          {...shared}
+          title={win.title}
+          imageSrc={win.image}
+        />
+      );
+    }
+
+    if (win.type === 'pdf') {
+      return (
+        <PdfViewer
+          {...shared}
+          title={win.title}
+          pdfSrc={win.pdf}
+        />
+      );
+    }
+
+    if (win.type === 'cd_player') {
+      return (
+        <CDPlayer
+          {...shared}
+          autoplay={win.autoplay}
+          track={win.track}
+          onEject={() => triggerErrorAction(openErrorDialog, 'cd_eject')}
+        />
+      );
+    }
+
+    if (win.type === 'notes') {
+      return (
+        <NotesApp
+          {...shared}
+          title={win.title}
+        />
+      );
+    }
+
+    if (win.type === 'credits') {
+      return (
+        <CreditsWindow
+          {...shared}
+          title={win.title}
+        />
+      );
+    }
+
+    if (win.type === 'listen') {
+      return (
+        <ListenWindow
+          {...shared}
+          title={win.title}
+          onPlayTrack={(trackId) => {
+            const track = getListenTrack(trackId);
+            if (!track) return;
+            openAudioView(track, { autoplay: true });
+          }}
+        />
+      );
+    }
+
+    if (win.type === 'email') {
+      return (
+        <EmailApp
+          {...shared}
+          title={win.title}
+        />
+      );
+    }
+
+    if (win.type === 'error') {
+      return (
+        <ErrorDialog
+          {...shared}
+          title={win.title}
+          message={win.message}
+          actions={win.actions}
+          icon={win.icon}
+          layout={win.layout}
+          onAction={(actionId) => handleErrorAction(win, actionId)}
+        />
+      );
+    }
+
+    if (win.type === 'ad_diction') {
+      return (
+        <AdDictionWindow
+          {...shared}
+          adsShownCount={win.adsShownCount}
+          attentionEuros={win.attentionEuros}
+          onClose={() => handleCloseAdDictionWindow(win.instanceId)}
+          onBlockAds={() => handleAdPromptAction('block_ads')}
+        />
+      );
+    }
+
+    if (win.type === 'simple') {
+      if (win.image) {
+        return (
+          <ImageViewer
+            {...shared}
+            title={win.title}
+            imageSrc={win.image}
+          />
+        );
+      }
+
+      return (
+        <SimpleWindow
+          {...shared}
+          title={win.title}
+        />
+      );
+    }
+
+    return null;
+  }
+
+  const normalWindows = windows.filter((win) => (
+    !isPopupDesktopWindow(win) && !isPriorityDesktopWindow(win)
+  ));
+  const popupWindows = windows.filter((win) => isPopupDesktopWindow(win));
+  const priorityWindows = windows.filter((win) => isPriorityDesktopWindow(win));
+
   return (
     <>
       <main className="desktop" ref={desktopRef} onMouseDown={handleDesktopMouseDown}>
@@ -226,186 +406,35 @@ export default function Desktop({ isActive = true }) {
           />
         ))}
 
-        {windows.map((win) => {
-          if (win.minimized && win.type !== 'rat_race') return null;
+        <div className="desktop__layer desktop__layer--normal">
+          {normalWindows.map((win) => renderDesktopWindow(win))}
+        </div>
 
-          const shared = {
-            key: win.instanceId,
-            zIndex: win.zIndex,
-            containerRef: desktopRef,
-            stackOffset: win.stackIndex,
-            onClose: () => closeWindow(win.instanceId),
-            onFocus: () => focusWindow(win.instanceId),
-          };
+        <div className="desktop__layer desktop__layer--popup">
+          {popupWindows.map((win) => renderDesktopWindow(win))}
+          <FakeAdOverlay
+            src={currentAd}
+            zIndex={adZIndex}
+            onClose={dismissAd}
+            onFocus={() => setAdZIndex(allocatePopupZIndex())}
+            containerRef={desktopRef}
+          />
+          <AdDictionPrompt
+            showAdDiction={showAdDiction}
+            showOffGrid={showOffGrid}
+            onAction={handleAdPromptAction}
+            onCloseAdDiction={() => setShowAdDiction(false)}
+            onCloseOffGrid={() => setShowOffGrid(false)}
+          />
+        </div>
 
-          if (win.type === 'rat_race') {
-            return (
-              <RatRaceWindow
-                {...shared}
-                title={win.title}
-                minimized={Boolean(win.minimized)}
-              />
-            );
-          }
-
-          if (win.type === 'folder') {
-            const config = folderWindows[win.appId];
-            if (!config) return null;
-            const nav = win.folderNav;
-            return (
-              <FolderWindow
-                {...shared}
-                config={config}
-                folderPath={nav.path}
-                canGoBack={nav.index > 0}
-                canGoForward={nav.index < nav.history.length - 1}
-                onBack={() => folderBack(win.instanceId)}
-                onForward={() => folderForward(win.instanceId)}
-                onOpenItem={(item) => handleOpenFolderItem(item, win.instanceId)}
-              />
-            );
-          }
-
-          if (win.type === 'image') {
-            return (
-              <ImageViewer
-                {...shared}
-                title={win.title}
-                imageSrc={win.image}
-              />
-            );
-          }
-
-          if (win.type === 'pdf') {
-            return (
-              <PdfViewer
-                {...shared}
-                title={win.title}
-                pdfSrc={win.pdf}
-              />
-            );
-          }
-
-          if (win.type === 'cd_player') {
-            return (
-              <CDPlayer
-                {...shared}
-                autoplay={win.autoplay}
-                track={win.track}
-                onEject={() => triggerErrorAction(openErrorDialog, 'cd_eject')}
-              />
-            );
-          }
-
-          if (win.type === 'notes') {
-            return (
-              <NotesApp
-                {...shared}
-                title={win.title}
-              />
-            );
-          }
-
-          if (win.type === 'credits') {
-            return (
-              <CreditsWindow
-                {...shared}
-                title={win.title}
-              />
-            );
-          }
-
-          if (win.type === 'listen') {
-            return (
-              <ListenWindow
-                {...shared}
-                title={win.title}
-                onPlayTrack={(trackId) => {
-                  const track = getListenTrack(trackId);
-                  if (!track) return;
-                  openAudioView(track, { autoplay: true });
-                }}
-              />
-            );
-          }
-
-          if (win.type === 'email') {
-            return (
-              <EmailApp
-                {...shared}
-                title={win.title}
-              />
-            );
-          }
-
-          if (win.type === 'error') {
-            return (
-              <ErrorDialog
-                {...shared}
-                title={win.title}
-                message={win.message}
-                actions={win.actions}
-                icon={win.icon}
-                layout={win.layout}
-                onAction={(actionId) => handleErrorAction(win, actionId)}
-              />
-            );
-          }
-
-          if (win.type === 'ad_diction') {
-            return (
-              <AdDictionWindow
-                {...shared}
-                adsShownCount={win.adsShownCount}
-                attentionEuros={win.attentionEuros}
-                onClose={() => handleCloseAdDictionWindow(win.instanceId)}
-                onBlockAds={() => handleAdPromptAction('block_ads')}
-              />
-            );
-          }
-
-          if (win.type === 'simple') {
-            if (win.image) {
-              return (
-                <ImageViewer
-                  {...shared}
-                  title={win.title}
-                  imageSrc={win.image}
-                />
-              );
-            }
-
-            return (
-              <SimpleWindow
-                {...shared}
-                title={win.title}
-              />
-            );
-          }
-
-          return null;
-        })}
-
-        <VirusVideo
-          isOpen={Boolean(aiWindow)}
-          onClose={() => aiWindow && closeWindow(aiWindow.instanceId)}
-        />
-
-        <FakeAdOverlay
-          src={currentAd}
-          zIndex={adZIndex}
-          onClose={dismissAd}
-          onFocus={() => setAdZIndex(allocateZIndex())}
-          containerRef={desktopRef}
-        />
-
-        <AdDictionPrompt
-          showAdDiction={showAdDiction}
-          showOffGrid={showOffGrid}
-          onAction={handleAdPromptAction}
-          onCloseAdDiction={() => setShowAdDiction(false)}
-          onCloseOffGrid={() => setShowOffGrid(false)}
-        />
+        <div className="desktop__layer desktop__layer--priority">
+          {priorityWindows.map((win) => renderDesktopWindow(win))}
+          <VirusVideo
+            isOpen={Boolean(aiWindow)}
+            onClose={() => aiWindow && closeWindow(aiWindow.instanceId)}
+          />
+        </div>
       </main>
 
       <Taskbar

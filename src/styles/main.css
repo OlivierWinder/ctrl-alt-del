@@ -34,6 +34,7 @@ body {
     width: 100vw;
     height: 100vh;
     position: relative;
+    isolation: isolate;
     background-color: var(--win-bg);
     background-image: var(--desktop-bg-url, url('/RESOURCES/desktop_bg.png'));
     background-size: cover;
@@ -41,6 +42,42 @@ body {
     background-repeat: no-repeat;
     overflow: hidden;
     /* Prevent any scrolling */
+}
+
+/* Stacking layers: popups (ads/errors) always stay under media apps */
+
+.desktop__layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    isolation: isolate;
+    transform: translateZ(0);
+}
+
+.desktop__layer > * {
+    pointer-events: auto;
+}
+
+.desktop__layer--normal {
+    z-index: 1;
+}
+
+.desktop__layer--popup {
+    z-index: 2;
+}
+
+.desktop__layer--priority {
+    z-index: 3;
+}
+
+.desktop__layer--priority .window,
+.desktop__layer--priority .virus_video {
+    z-index: 10 !important;
+}
+
+.desktop__layer--popup .window,
+.desktop__layer--popup .ad-diction-prompt {
+    z-index: 1 !important;
 }
 
 /* ICONS */
