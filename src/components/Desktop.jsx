@@ -369,7 +369,7 @@ export default function Desktop({ isActive = true }) {
               orderCopyTimerRef.current = window.setTimeout(() => {
                 orderCopyTimerRef.current = null;
                 openOrderPhysicalCopy();
-              }, 60 * 1000);
+              }, 10 * 1000);
             }
           }}
         />

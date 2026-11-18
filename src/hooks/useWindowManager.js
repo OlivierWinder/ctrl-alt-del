@@ -317,26 +317,26 @@ export function useWindowManager() {
       const without = current.filter((win) => (
         win.type !== 'order_physical' && win.type !== 'listen_ep'
       ));
-      const placed = placePopupOpen(without);
+      const zIndex = allocZ();
       const instanceId = existing?.instanceId || allocId();
       const stackIndex = existing
         ? ((existing.stackIndex ?? 0) + 1) % 8
-        : placed.windows.length;
+        : without.length;
       setFocusedId(instanceId);
       return [
-        ...placed.windows,
+        ...without,
         {
           instanceId,
           type: 'order_physical',
           appId: 'order_physical',
           title: 'ORDER PHYSICAL COPY',
-          zIndex: placed.zIndex,
+          zIndex,
           stackIndex,
           minimized: false,
         },
       ];
     });
-  }, [allocId, placePopupOpen]);
+  }, [allocId, allocZ]);
 
   const openListenEpPrompt = useCallback(() => {
     setWindows((current) => {

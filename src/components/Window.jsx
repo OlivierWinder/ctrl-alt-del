@@ -39,6 +39,7 @@ export default function Window({
     variant === 'listen' ? 'window--listen' : '',
     variant === 'shop' ? 'window--shop' : '',
     variant === 'order-copy' ? 'window--order-copy' : '',
+    variant === 'order-physical' ? 'window--order-physical' : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -55,7 +56,8 @@ export default function Window({
     || variant === 'ratrace'
     || variant === 'listen'
     || variant === 'shop'
-    || variant === 'order-copy';
+    || variant === 'order-copy'
+    || variant === 'order-physical';
 
   const style = {
     display: isFlexColumn ? 'flex' : 'block',

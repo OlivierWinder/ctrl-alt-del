@@ -11,7 +11,7 @@ export default function OrderPhysicalCopyWindow({
   return (
     <Window
       title="ORDER PHYSICAL COPY"
-      variant="order-copy"
+      variant="order-physical"
       zIndex={zIndex}
       containerRef={containerRef}
       stackOffset={stackOffset}
@@ -19,8 +19,7 @@ export default function OrderPhysicalCopyWindow({
       onClose={onClose}
       onFocus={onFocus}
     >
-      <div className="order-copy">
-        <p className="order-copy__message">ORDER PHYSICAL COPY</p>
+      <div className="order-copy order-copy--physical">
         <button
           type="button"
           className="order-copy__btn"
