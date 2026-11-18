@@ -39,7 +39,8 @@ export function useWindowDrag(
   const randomSeeded = useRef(false);
 
   const placeWindow = useCallback(() => {
-    if (!windowRef.current || !containerRef.current || hasBeenDragged.current) return;
+    if (!windowRef.current || !containerRef.current) return;
+    if (hasBeenDragged.current || isDragging.current) return;
 
     if (placement === 'random') {
       if (randomSeeded.current) return;
@@ -55,7 +56,13 @@ export function useWindowDrag(
     hasBeenDragged.current = false;
     randomSeeded.current = false;
     placeWindow();
-  }, [placeWindow, recenterKey]);
+    // Only re-seed placement when the window should explicitly recenter.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recenterKey]);
+
+  useLayoutEffect(() => {
+    placeWindow();
+  }, [placeWindow]);
 
   useEffect(() => {
     const win = windowRef.current;

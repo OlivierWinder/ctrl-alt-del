@@ -14,6 +14,8 @@ import './styles/system-blue-screen.css';
 import './styles/credits-window.css';
 import './styles/ratrace-window.css';
 import './styles/listen-window.css';
+import './styles/shop-windows.css';
+import './styles/order-copy-window.css';
 
 document.documentElement.style.setProperty(
   '--desktop-bg-url',

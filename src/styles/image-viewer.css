@@ -38,7 +38,6 @@
     position: absolute;
     right: 18px;
     bottom: 52px;
-    z-index: 1;
     width: min(320px, calc(100vw - 36px));
     box-sizing: border-box;
     background: var(--win-gray);
@@ -71,7 +70,7 @@
     left: 50%;
     transform: translate(-42%, -38%);
     width: min(420px, calc(100vw - 36px));
-    z-index: 2;
+    z-index: 9001;
 }
 
 .ad-diction-prompt .error-dialog {

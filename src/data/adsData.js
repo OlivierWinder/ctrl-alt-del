@@ -5,7 +5,7 @@ export const NEXT_AD_MIN_MS = 30 * 1000;
 export const NEXT_AD_MAX_MS = 60 * 1000;
 
 export const fakeAds = [
-  '/RESOURCES/ads/ad_01.jpg',
+  '/RESOURCES/ads/ad_01.png',
   '/RESOURCES/ads/ad_02.png',
   '/RESOURCES/ads/ad_03.png',
   '/RESOURCES/ads/ad_04.png',
@@ -18,14 +18,6 @@ export const fakeAds = [
   '/RESOURCES/ads/ad_11.png',
   '/RESOURCES/ads/ad_12.png',
   '/RESOURCES/ads/ad_13.png',
-  '/RESOURCES/ads/ad_14.png',
-  '/RESOURCES/ads/ad_15.png',
-  '/RESOURCES/ads/ad_16.png',
-  '/RESOURCES/ads/ad_17.png',
-  '/RESOURCES/ads/ad_18.png',
-  '/RESOURCES/ads/ad_19.png',
-  '/RESOURCES/ads/ad_20.png',
-  '/RESOURCES/ads/ad_21.png',
 ];
 
 export const adDictionPrompt = {

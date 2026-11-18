@@ -44,40 +44,26 @@ body {
     /* Prevent any scrolling */
 }
 
-/* Stacking layers: popups (ads/errors) always stay under media apps */
+/* One window stack — whatever is pressed rises via its inline z-index */
 
 .desktop__layer {
     position: absolute;
     inset: 0;
     pointer-events: none;
     isolation: isolate;
-    transform: translateZ(0);
 }
 
 .desktop__layer > * {
     pointer-events: auto;
 }
 
-.desktop__layer--normal {
+.desktop__layer--windows {
     z-index: 1;
 }
 
-.desktop__layer--popup {
-    z-index: 2;
-}
-
-.desktop__layer--priority {
-    z-index: 3;
-}
-
-.desktop__layer--priority .window,
-.desktop__layer--priority .virus_video {
-    z-index: 10 !important;
-}
-
-.desktop__layer--popup .window,
-.desktop__layer--popup .ad-diction-prompt {
-    z-index: 1 !important;
+/* Virus stays above other app windows */
+.desktop__layer--windows .virus_video {
+    z-index: 999999;
 }
 
 /* ICONS */
@@ -90,7 +76,7 @@ body {
     align-items: center;
     gap: 4px;
     text-align: center;
-    color: white;
+    color: #000000;
     font-size: 11px;
     cursor: default;
     user-select: none;
@@ -128,11 +114,13 @@ body {
     /* blue opaque overlay */
     border-radius: 4px;
     /* slightly round corners like Windows 98 */
-    z-index: 1000;
+    /* Keep under window layers so dialogs stay draggable / on top */
+    z-index: 0;
 }
 
 .desktop__icon.selected .desktop__icon__span {
-    color: white;
+    color: #ffffff;
+    background: #000080;
 }
 
 .desktop__icon--hidden {
@@ -416,11 +404,19 @@ body {
     background: var(--win-blue);
     color: white;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 6px;
     padding: 0 4px;
     font-weight: bold;
     cursor: move;
+}
+
+.window__title_text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .title_bar__button {
@@ -702,6 +698,17 @@ body {
     flex-direction: column;
 }
 
+.window--cdplayer .window__title_bar {
+    background: #f2e100;
+    color: #000000;
+}
+
+.window--cdplayer .title_bar__button {
+    color: #000000;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    background: var(--win-gray);
+}
+
 .cd_player {
     display: flex;
     flex-direction: column;
@@ -755,6 +762,14 @@ body {
     pointer-events: none;
 }
 
+.cd_player__controls-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
 .cd_player__controls {
     display: flex;
     flex-direction: row;
@@ -763,6 +778,26 @@ body {
     justify-content: flex-start;
     gap: 6px;
     flex-shrink: 0;
+}
+
+.cd_player__playlist-btn {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    background: #f2e100;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cd_player__playlist-btn:active {
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
 }
 
 .cd_player__btn {
@@ -786,10 +821,6 @@ body {
 .cd_player__btn--play {
     width: 56px;
     height: 36px;
-}
-
-.cd_player__btn--eject {
-    width: 40px;
 }
 
 .cd_player__symbol {
@@ -818,36 +849,6 @@ body {
 .cd_player__symbol--stop {
     width: 12px;
     height: 12px;
-    background: #000;
-}
-
-.cd_player__symbol--eject {
-    width: 14px;
-    height: 14px;
-    position: relative;
-    background: transparent;
-}
-
-.cd_player__symbol--eject::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-bottom: 9px solid #000;
-}
-
-.cd_player__symbol--eject::after {
-    content: '';
-    position: absolute;
-    left: 1px;
-    bottom: 0;
-    width: 12px;
-    height: 3px;
     background: #000;
 }
 

@@ -17,6 +17,9 @@ function formatTime(seconds) {
   return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
+const PLAYLIST_URL =
+  'https://open.spotify.com/album/7uk1aaKzZp5c3qsKmWKy73?si=GCWwhVivQ2u26sNnRE0NWw';
+
 export default function CDPlayer({
   zIndex,
   containerRef,
@@ -25,7 +28,6 @@ export default function CDPlayer({
   stackOffset = 0,
   onClose,
   onFocus,
-  onEject,
 }) {
   const audioRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(0);
@@ -105,13 +107,8 @@ export default function CDPlayer({
     setCurrentTime(0);
   }
 
-  function eject() {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    setCurrentTime(0);
-    onEject?.();
+  function openPlaylist() {
+    window.open(PLAYLIST_URL, '_blank', 'noopener,noreferrer');
   }
 
   const remaining = Math.max(0, duration - currentTime);
@@ -135,42 +132,43 @@ export default function CDPlayer({
             </div>
           </div>
 
-          <div className="cd_player__controls">
+          <div className="cd_player__controls-col">
+            <div className="cd_player__controls">
+              <button
+                type="button"
+                className="cd_player__btn cd_player__btn--play"
+                onClick={play}
+                aria-label="Play"
+                title="Play"
+              >
+                <span className="cd_player__symbol cd_player__symbol--play" />
+              </button>
+              <button
+                type="button"
+                className="cd_player__btn"
+                onClick={pause}
+                aria-label="Pause"
+                title="Pause"
+              >
+                <span className="cd_player__symbol cd_player__symbol--pause" />
+              </button>
+              <button
+                type="button"
+                className="cd_player__btn"
+                onClick={stop}
+                aria-label="Stop"
+                title="Stop"
+              >
+                <span className="cd_player__symbol cd_player__symbol--stop" />
+              </button>
+            </div>
+
             <button
               type="button"
-              className="cd_player__btn cd_player__btn--play"
-              onClick={play}
-              aria-label="Play"
-              title="Play"
+              className="cd_player__playlist-btn"
+              onClick={openPlaylist}
             >
-              <span className="cd_player__symbol cd_player__symbol--play" />
-            </button>
-            <button
-              type="button"
-              className="cd_player__btn"
-              onClick={pause}
-              aria-label="Pause"
-              title="Pause"
-            >
-              <span className="cd_player__symbol cd_player__symbol--pause" />
-            </button>
-            <button
-              type="button"
-              className="cd_player__btn"
-              onClick={stop}
-              aria-label="Stop"
-              title="Stop"
-            >
-              <span className="cd_player__symbol cd_player__symbol--stop" />
-            </button>
-            <button
-              type="button"
-              className="cd_player__btn cd_player__btn--eject"
-              onClick={eject}
-              aria-label="Eject"
-              title="Eject"
-            >
-              <span className="cd_player__symbol cd_player__symbol--eject" />
+              Open track
             </button>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { useWindowDrag } from '../hooks/useWindowDrag';
 
 export default function Window({
   title,
+  titleIcon,
   variant = 'default',
   zIndex,
   containerRef,
@@ -36,6 +37,8 @@ export default function Window({
     variant === 'credits' ? 'window--credits' : '',
     variant === 'ratrace' ? 'window--ratrace' : '',
     variant === 'listen' ? 'window--listen' : '',
+    variant === 'shop' ? 'window--shop' : '',
+    variant === 'order-copy' ? 'window--order-copy' : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -50,7 +53,9 @@ export default function Window({
     || variant === 'email-reply'
     || variant === 'credits'
     || variant === 'ratrace'
-    || variant === 'listen';
+    || variant === 'listen'
+    || variant === 'shop'
+    || variant === 'order-copy';
 
   const style = {
     display: isFlexColumn ? 'flex' : 'block',
@@ -76,7 +81,10 @@ export default function Window({
           onTitleBarMouseDown(event);
         }}
       >
-        {title}
+        {titleIcon ? (
+          <img className="window__title_icon" src={titleIcon} alt="" draggable={false} />
+        ) : null}
+        <span className="window__title_text">{title}</span>
         <button type="button" className="title_bar__button" onClick={onClose}>
           X
         </button>

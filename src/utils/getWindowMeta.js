@@ -49,6 +49,27 @@ export function getWindowMeta(win) {
     };
   }
 
+  if (win.type === 'cd_rom') {
+    return {
+      title: win.title || 'CD_ROM',
+      icon: desktopIcon?.icon || '/RESOURCES/cd_rom_icon.png',
+    };
+  }
+
+  if (win.type === 'order_physical') {
+    return {
+      title: win.title || 'ORDER PHYSICAL COPY',
+      icon: '/RESOURCES/cd_rom_icon.png',
+    };
+  }
+
+  if (win.type === 'listen_ep') {
+    return {
+      title: win.title || 'LISTEN TO EP',
+      icon: '/RESOURCES/cd_audio.png',
+    };
+  }
+
   if (win.type === 'rat_race') {
     return {
       title: win.title || 'RatRaceRevolution',
@@ -63,7 +84,7 @@ export function getWindowMeta(win) {
     };
   }
 
-  if (win.type === 'ad_diction') {
+  if (win.type === 'ad_diction' || win.type === 'off_grid') {
     return {
       title: win.title || 'ad-diction',
       icon: '/RESOURCES/icon_adblocker.png',

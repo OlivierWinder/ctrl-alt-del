@@ -17,12 +17,17 @@ function shuffle(list) {
 
 /**
  * Fake ads — only schedules once the desktop session is active.
- * more info opens a centered ad-diction window (taskbar); off-grid overlays it.
+ * more info / block-ads open real overlay windows (draggable, raise on focus).
  */
-export function useFakeAds({ isActive, openAdDictionWindow, closeAdDictionWindow }) {
+export function useFakeAds({
+  isActive,
+  openAdDictionWindow,
+  closeAdDictionWindow,
+  openOffGridWindow,
+  closeOffGridWindow,
+}) {
   const [currentAd, setCurrentAd] = useState(null);
   const [showAdDiction, setShowAdDiction] = useState(false);
-  const [showOffGrid, setShowOffGrid] = useState(false);
   const [adsShownCount, setAdsShownCount] = useState(0);
   const [attentionEuros, setAttentionEuros] = useState(0);
   const queueRef = useRef([]);
@@ -70,11 +75,11 @@ export function useFakeAds({ isActive, openAdDictionWindow, closeAdDictionWindow
       clearTimer();
       setCurrentAd(null);
       setShowAdDiction(false);
-      setShowOffGrid(false);
       setAdsShownCount(0);
       setAttentionEuros(0);
       adsShownRef.current = 0;
       closeAdDictionWindow?.();
+      closeOffGridWindow?.();
       return undefined;
     }
 
@@ -83,12 +88,11 @@ export function useFakeAds({ isActive, openAdDictionWindow, closeAdDictionWindow
     setAdsShownCount(0);
     setAttentionEuros(0);
     setShowAdDiction(false);
-    setShowOffGrid(false);
     queueRef.current = shuffle(fakeAds);
     scheduleAd(FIRST_AD_DELAY_MS);
 
     return () => clearTimer();
-  }, [isActive, clearTimer, scheduleAd, closeAdDictionWindow]);
+  }, [isActive, clearTimer, scheduleAd, closeAdDictionWindow, closeOffGridWindow]);
 
   const dismissAd = useCallback(() => {
     if (!currentAd) return;
@@ -123,24 +127,32 @@ export function useFakeAds({ isActive, openAdDictionWindow, closeAdDictionWindow
     }
 
     if (actionId === 'block_ads') {
-      setShowOffGrid(true);
+      setShowAdDiction(false);
+      closeAdDictionWindow?.();
+      openOffGridWindow?.();
       return undefined;
     }
 
     if (actionId === 'yes') {
-      setShowOffGrid(false);
+      closeOffGridWindow?.();
       closeAdDictionWindow?.();
       disableInternetViaAdBlocker();
       return { wentOffGrid: true };
     }
 
     if (actionId === 'no') {
-      setShowOffGrid(false);
+      closeOffGridWindow?.();
       return { wentOffGrid: false };
     }
 
     return undefined;
-  }, [openAdDictionWindow, closeAdDictionWindow, disableInternetViaAdBlocker]);
+  }, [
+    openAdDictionWindow,
+    closeAdDictionWindow,
+    openOffGridWindow,
+    closeOffGridWindow,
+    disableInternetViaAdBlocker,
+  ]);
 
   useEffect(() => {
     if (!isActive) {
@@ -152,11 +164,9 @@ export function useFakeAds({ isActive, openAdDictionWindow, closeAdDictionWindow
     currentAd,
     dismissAd,
     showAdDiction,
-    showOffGrid,
     adsShownCount,
     attentionEuros,
     setShowAdDiction,
-    setShowOffGrid,
     handlePromptAction,
     stopAds,
     isInternetDisabledByAdBlocker: () => internetDisabledByAdBlockerRef.current,

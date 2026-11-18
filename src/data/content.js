@@ -1,7 +1,7 @@
 import { folderWindows as filesFolderWindows } from './filesStructure';
 import { listenFolderWindows } from './listenStructure';
 
-// Flip to false to show LISTEN / CD-ROM / AI again after screen recording.
+// Flip to false to show LISTEN / CD_ROM / AI again after screen recording.
 export const hideIconsForRecording = false;
 
 export const desktopIcons = [
@@ -46,7 +46,7 @@ export const desktopIcons = [
   },
   {
     id: 'cd_rom',
-    label: 'CD-ROM',
+    label: 'CD_ROM',
     icon: '/RESOURCES/cd_rom_icon.png',
     position: { column: 'right', row: 1 },
     hidden: hideIconsForRecording,
@@ -76,7 +76,6 @@ export const simpleWindows = {
     title: 'BANK BALANCE',
     image: '/RESOURCES/bank_balance_window.png',
   },
-  cd_rom: { title: 'CD-ROM' },
 };
 
 export const notesApp = {

@@ -9,35 +9,28 @@ function createFolderNav(windowId, path) {
   };
 }
 
-// Popup layer (ads / errors / ad-detected) stays below priority media apps.
-const POPUP_Z_MIN = 1000;
-const POPUP_Z_MAX = 7999;
-const NORMAL_Z_MIN = 8000;
-const NORMAL_Z_MAX = 19999;
-const PRIORITY_Z_MIN = 20000;
-
-function isPopupWindow(win) {
-  return win?.type === 'error' || win?.type === 'ad_diction';
-}
+// One shared stack. Click always rises to the top.
+// New popups open under Listen / CD player / game / AI / CD_ROM, over everything else.
+const Z_MIN = 1000;
+const Z_MAX = 49999;
 
 function isPriorityWindow(win) {
   return (
     win?.type === 'listen'
-    || win?.type === 'rat_race'
     || win?.type === 'cd_player'
+    || win?.type === 'rat_race'
     || win?.type === 'ai'
-    || win?.appId === 'cd_rom'
+    || win?.type === 'cd_rom'
   );
 }
 
 export function useWindowManager() {
   const nextIdRef = useRef(1);
-  const nextPopupZRef = useRef(POPUP_Z_MIN);
-  const nextZRef = useRef(NORMAL_Z_MIN);
-  const nextPriorityZRef = useRef(PRIORITY_Z_MIN);
+  const nextZRef = useRef(Z_MIN);
   const shownErrorsRef = useRef(new Set());
   const [windows, setWindows] = useState([]);
   const [focusedId, setFocusedId] = useState(null);
+  const externalPopupZRef = useRef(0);
 
   const allocId = useCallback(() => {
     const id = `win-${nextIdRef.current}`;
@@ -45,28 +38,72 @@ export function useWindowManager() {
     return id;
   }, []);
 
-  const allocPopupZ = useCallback(() => {
-    nextPopupZRef.current += 1;
-    if (nextPopupZRef.current > POPUP_Z_MAX) nextPopupZRef.current = POPUP_Z_MIN + 1;
-    return nextPopupZRef.current;
-  }, []);
-
   const allocZ = useCallback(() => {
     nextZRef.current += 1;
-    if (nextZRef.current > NORMAL_Z_MAX) nextZRef.current = NORMAL_Z_MIN + 1;
-    return nextZRef.current;
+    if (nextZRef.current > Z_MAX) nextZRef.current = Z_MIN + 1;
+    const zIndex = nextZRef.current;
+    externalPopupZRef.current = Math.max(externalPopupZRef.current, zIndex);
+    return zIndex;
   }, []);
 
-  const allocPriorityZ = useCallback(() => {
-    nextPriorityZRef.current += 1;
-    return nextPriorityZRef.current;
+  const syncZCeiling = useCallback((list) => {
+    const maxZ = list.reduce((max, win) => Math.max(max, win.zIndex || 0), nextZRef.current);
+    nextZRef.current = maxZ;
   }, []);
 
-  const allocForWindow = useCallback((win) => {
-    if (isPopupWindow(win)) return allocPopupZ();
-    if (isPriorityWindow(win)) return allocPriorityZ();
-    return allocZ();
-  }, [allocPopupZ, allocPriorityZ, allocZ]);
+  /**
+   * Open under priority media apps, above all other windows / prior popups.
+   * Priority windows are bumped up when needed so the new popup fits underneath.
+   */
+  const placePopupOpen = useCallback((current, extraZs = []) => {
+    const priority = current.filter((win) => isPriorityWindow(win) && !win.minimized);
+    const nonPriorityZs = current
+      .filter((win) => !isPriorityWindow(win))
+      .map((win) => win.zIndex);
+    const maxNon = Math.max(
+      Z_MIN - 1,
+      ...nonPriorityZs,
+      ...extraZs.filter((z) => z > 0),
+      externalPopupZRef.current,
+    );
+    const popupZ = maxNon + 1;
+
+    if (!priority.length) {
+      const zIndex = allocZ();
+      externalPopupZRef.current = Math.max(externalPopupZRef.current, zIndex);
+      return { zIndex, windows: current };
+    }
+
+    let nextWindows = current;
+    const minPri = Math.min(...priority.map((win) => win.zIndex));
+    if (popupZ >= minPri) {
+      const bump = (popupZ + 1) - minPri;
+      nextWindows = current.map((win) => (
+        isPriorityWindow(win) ? { ...win, zIndex: win.zIndex + bump } : win
+      ));
+      syncZCeiling(nextWindows);
+    }
+
+    nextZRef.current = Math.max(nextZRef.current, popupZ);
+    externalPopupZRef.current = Math.max(externalPopupZRef.current, popupZ);
+    return { zIndex: popupZ, windows: nextWindows };
+  }, [allocZ, syncZCeiling]);
+
+  const allocatePopupOpenZIndex = useCallback(() => {
+    let assigned = 0;
+    setWindows((current) => {
+      const placed = placePopupOpen(current);
+      assigned = placed.zIndex;
+      return placed.windows;
+    });
+    if (!assigned) {
+      assigned = allocZ();
+      externalPopupZRef.current = Math.max(externalPopupZRef.current, assigned);
+    }
+    return assigned;
+  }, [allocZ, placePopupOpen]);
+
+  const allocForWindow = useCallback(() => allocZ(), [allocZ]);
 
   const focusWindow = useCallback((instanceId) => {
     setWindows((current) => {
@@ -165,26 +202,16 @@ export function useWindowManager() {
   }, [allocId, allocZ]);
 
   const openAudioView = useCallback((track, options = {}) => {
-    const zIndex = allocPriorityZ();
+    const zIndex = allocZ();
     setWindows((current) => {
       const existing = current.find((win) => win.type === 'cd_player');
       const withoutPlayers = current.filter((win) => win.type !== 'cd_player');
-
-      if (existing) {
-        setFocusedId(existing.instanceId);
-        return [
-          ...withoutPlayers,
-          {
-            ...existing,
-            track,
-            autoplay: options.autoplay !== false,
-            zIndex,
-            minimized: false,
-          },
-        ];
-      }
-
+      // New instance + bumped cascade so replacing a track looks like a fresh open.
       const instanceId = allocId();
+      const stackIndex = existing
+        ? ((existing.stackIndex ?? 0) + 1) % 8
+        : current.length;
+
       setFocusedId(instanceId);
       return [
         ...withoutPlayers,
@@ -196,38 +223,27 @@ export function useWindowManager() {
           track,
           autoplay: options.autoplay !== false,
           zIndex,
-          stackIndex: current.length,
+          stackIndex,
           minimized: false,
         },
       ];
     });
-  }, [allocId, allocPriorityZ]);
+  }, [allocId, allocZ]);
 
   const openAdDictionWindow = useCallback(({ adsShownCount = 0, attentionEuros = 0 } = {}) => {
     setWindows((current) => {
       const existing = current.find((win) => win.type === 'ad_diction');
-
-      if (existing) {
-        const zIndex = allocPopupZ();
-        setFocusedId(existing.instanceId);
-        return current.map((win) => (
-          win.instanceId === existing.instanceId
-            ? {
-              ...win,
-              adsShownCount,
-              attentionEuros,
-              zIndex,
-              minimized: false,
-            }
-            : win
-        ));
-      }
-
+      const without = current.filter((win) => (
+        win.type !== 'ad_diction' && win.type !== 'off_grid'
+      ));
+      const placed = placePopupOpen(without);
       const instanceId = allocId();
-      const zIndex = allocPopupZ();
+      const stackIndex = existing
+        ? ((existing.stackIndex ?? 0) + 1) % 8
+        : placed.windows.length;
       setFocusedId(instanceId);
       return [
-        ...current,
+        ...placed.windows,
         {
           instanceId,
           type: 'ad_diction',
@@ -235,13 +251,13 @@ export function useWindowManager() {
           title: 'ad-diction',
           adsShownCount,
           attentionEuros,
-          zIndex,
-          stackIndex: current.length,
+          zIndex: placed.zIndex,
+          stackIndex,
           minimized: false,
         },
       ];
     });
-  }, [allocId, allocPopupZ]);
+  }, [allocId, placePopupOpen]);
 
   const closeAdDictionWindow = useCallback(() => {
     setWindows((current) => {
@@ -256,6 +272,99 @@ export function useWindowManager() {
     });
   }, []);
 
+  const openOffGridWindow = useCallback(() => {
+    setWindows((current) => {
+      const withoutStats = current.filter((win) => win.type !== 'ad_diction');
+      const existing = withoutStats.find((win) => win.type === 'off_grid');
+      const without = withoutStats.filter((win) => win.type !== 'off_grid');
+      const placed = placePopupOpen(without);
+      const stackIndex = existing
+        ? ((existing.stackIndex ?? 0) + 1) % 8
+        : placed.windows.length;
+      const instanceId = existing?.instanceId || allocId();
+      setFocusedId(instanceId);
+      return [
+        ...placed.windows,
+        {
+          instanceId,
+          type: 'off_grid',
+          appId: 'off_grid',
+          title: 'ad-diction',
+          zIndex: placed.zIndex,
+          stackIndex,
+          minimized: false,
+        },
+      ];
+    });
+  }, [allocId, placePopupOpen]);
+
+  const closeOffGridWindow = useCallback(() => {
+    setWindows((current) => {
+      const remaining = current.filter((win) => win.type !== 'off_grid');
+      setFocusedId((focused) => {
+        const closed = current.find((win) => win.type === 'off_grid');
+        if (!closed || focused !== closed.instanceId) return focused;
+        if (!remaining.length) return null;
+        return remaining.reduce((top, win) => (win.zIndex > top.zIndex ? win : top)).instanceId;
+      });
+      return remaining;
+    });
+  }, []);
+
+  const openOrderPhysicalCopy = useCallback(() => {
+    setWindows((current) => {
+      const existing = current.find((win) => win.type === 'order_physical');
+      const without = current.filter((win) => (
+        win.type !== 'order_physical' && win.type !== 'listen_ep'
+      ));
+      const placed = placePopupOpen(without);
+      const instanceId = existing?.instanceId || allocId();
+      const stackIndex = existing
+        ? ((existing.stackIndex ?? 0) + 1) % 8
+        : placed.windows.length;
+      setFocusedId(instanceId);
+      return [
+        ...placed.windows,
+        {
+          instanceId,
+          type: 'order_physical',
+          appId: 'order_physical',
+          title: 'ORDER PHYSICAL COPY',
+          zIndex: placed.zIndex,
+          stackIndex,
+          minimized: false,
+        },
+      ];
+    });
+  }, [allocId, placePopupOpen]);
+
+  const openListenEpPrompt = useCallback(() => {
+    setWindows((current) => {
+      const existing = current.find((win) => win.type === 'listen_ep');
+      const without = current.filter((win) => (
+        win.type !== 'listen_ep' && win.type !== 'order_physical'
+      ));
+      const placed = placePopupOpen(without);
+      const instanceId = existing?.instanceId || allocId();
+      const stackIndex = existing
+        ? ((existing.stackIndex ?? 0) + 1) % 8
+        : placed.windows.length;
+      setFocusedId(instanceId);
+      return [
+        ...placed.windows,
+        {
+          instanceId,
+          type: 'listen_ep',
+          appId: 'listen_ep',
+          title: 'LISTEN TO EP',
+          zIndex: placed.zIndex,
+          stackIndex,
+          minimized: false,
+        },
+      ];
+    });
+  }, [allocId, placePopupOpen]);
+
   const openErrorDialog = useCallback((error) => {
     if (!error) return false;
     if (error.once && shownErrorsRef.current.has(error.id)) return false;
@@ -264,29 +373,29 @@ export function useWindowManager() {
       const existing = current.find((win) => win.type === 'error' && win.appId === error.id);
 
       if (existing) {
-        const zIndex = allocPopupZ();
+        const without = current.filter((win) => win.instanceId !== existing.instanceId);
+        const placed = placePopupOpen(without);
         setFocusedId(existing.instanceId);
-        return current.map((win) => (
-          win.instanceId === existing.instanceId
-            ? {
-              ...win,
-              title: error.title,
-              message: error.message,
-              actions: error.actions || null,
-              icon: error.icon || null,
-              layout: error.layout || null,
-              zIndex,
-              minimized: false,
-            }
-            : win
-        ));
+        return [
+          ...placed.windows,
+          {
+            ...existing,
+            title: error.title,
+            message: error.message,
+            actions: error.actions || null,
+            icon: error.icon || null,
+            layout: error.layout || null,
+            zIndex: placed.zIndex,
+            minimized: false,
+          },
+        ];
       }
 
+      const placed = placePopupOpen(current);
       const instanceId = allocId();
-      const zIndex = allocPopupZ();
       setFocusedId(instanceId);
       return [
-        ...current,
+        ...placed.windows,
         {
           instanceId,
           type: 'error',
@@ -296,7 +405,7 @@ export function useWindowManager() {
           actions: error.actions || null,
           icon: error.icon || null,
           layout: error.layout || null,
-          zIndex,
+          zIndex: placed.zIndex,
           stackIndex: current.length,
           minimized: false,
         },
@@ -305,7 +414,7 @@ export function useWindowManager() {
 
     if (error.once) shownErrorsRef.current.add(error.id);
     return true;
-  }, [allocId, allocPopupZ]);
+  }, [allocId, placePopupOpen]);
 
   const openWindow = useCallback((appId) => {
     setWindows((current) => {
@@ -319,6 +428,7 @@ export function useWindowManager() {
           || win.type === 'rat_race'
           || win.type === 'email'
           || win.type === 'ai'
+          || win.type === 'cd_rom'
           || (win.type === 'pdf' && pdfWindows[appId])
         )
       ));
@@ -365,6 +475,13 @@ export function useWindowManager() {
           ...nextWin,
           type: 'listen',
           title: 'Listen',
+        };
+      } else if (appId === 'cd_rom') {
+        nextWin = {
+          ...nextWin,
+          type: 'cd_rom',
+          title: 'CD_ROM',
+          quantity: 1,
         };
       } else if (appId === 'rat_race_revolution') {
         nextWin = {
@@ -490,6 +607,12 @@ export function useWindowManager() {
     setFocusedId(instanceId);
   }, [allocZ]);
 
+  const patchWindow = useCallback((instanceId, patch) => {
+    setWindows((current) => current.map((win) => (
+      win.instanceId === instanceId ? { ...win, ...patch } : win
+    )));
+  }, []);
+
   return {
     windows,
     focusedId,
@@ -497,8 +620,13 @@ export function useWindowManager() {
     openPdfView,
     openImageView,
     openAudioView,
+    patchWindow,
     openAdDictionWindow,
     closeAdDictionWindow,
+    openOffGridWindow,
+    closeOffGridWindow,
+    openOrderPhysicalCopy,
+    openListenEpPrompt,
     openErrorDialog,
     navigateFolder,
     folderBack,
@@ -506,6 +634,7 @@ export function useWindowManager() {
     closeWindow,
     focusWindow,
     toggleMinimize,
-    allocatePopupZIndex: allocPopupZ,
+    allocateZIndex: allocZ,
+    allocatePopupOpenZIndex,
   };
 }

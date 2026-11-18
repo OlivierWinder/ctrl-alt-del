@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DesktopIcon from './DesktopIcon';
 import FolderWindow from './FolderWindow';
 import CDPlayer from './CDPlayer';
@@ -12,10 +12,14 @@ import VirusVideo from './VirusVideo';
 import FakeAdOverlay from './FakeAdOverlay';
 import AdDictionPrompt from './AdDictionPrompt';
 import AdDictionWindow from './AdDictionWindow';
+import OffGridWindow from './OffGridWindow';
 import SystemBlueScreen from './SystemBlueScreen';
 import CreditsWindow from './CreditsWindow';
 import RatRaceWindow from './RatRaceWindow';
 import ListenWindow from './ListenWindow';
+import ShopWindow from './ShopWindow';
+import OrderPhysicalCopyWindow from './OrderPhysicalCopyWindow';
+import ListenEpWindow from './ListenEpWindow';
 import Taskbar from './Taskbar';
 import { desktopIcons, folderWindows } from '../data/content';
 import { getListenTrack } from '../data/listenStructure';
@@ -63,8 +67,13 @@ export default function Desktop({ isActive = true }) {
     openPdfView,
     openImageView,
     openAudioView,
+    patchWindow,
     openAdDictionWindow,
     closeAdDictionWindow,
+    openOffGridWindow,
+    closeOffGridWindow,
+    openOrderPhysicalCopy,
+    openListenEpPrompt,
     openErrorDialog,
     navigateFolder,
     folderBack,
@@ -72,7 +81,8 @@ export default function Desktop({ isActive = true }) {
     closeWindow,
     focusWindow,
     toggleMinimize,
-    allocatePopupZIndex,
+    allocateZIndex,
+    allocatePopupOpenZIndex,
   } = useWindowManager();
 
   useErrorTriggers(openErrorDialog, isActive);
@@ -80,23 +90,53 @@ export default function Desktop({ isActive = true }) {
     currentAd,
     dismissAd,
     showAdDiction,
-    showOffGrid,
     setShowAdDiction,
-    setShowOffGrid,
     handlePromptAction,
     stopAds,
     isInternetDisabledByAdBlocker,
-  } = useFakeAds({ isActive, openAdDictionWindow, closeAdDictionWindow });
+  } = useFakeAds({
+    isActive,
+    openAdDictionWindow,
+    closeAdDictionWindow,
+    openOffGridWindow,
+    closeOffGridWindow,
+  });
 
   const [adZIndex, setAdZIndex] = useState(0);
+  const [promptZIndex, setPromptZIndex] = useState(0);
+  const listenIdleTimerRef = useRef(null);
+  const orderCopyTimerRef = useRef(null);
+  const hasPlayedListenTrackRef = useRef(false);
+
+  const clearListenPromoTimers = useCallback(() => {
+    if (listenIdleTimerRef.current != null) {
+      window.clearTimeout(listenIdleTimerRef.current);
+      listenIdleTimerRef.current = null;
+    }
+    if (orderCopyTimerRef.current != null) {
+      window.clearTimeout(orderCopyTimerRef.current);
+      orderCopyTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => () => clearListenPromoTimers(), [clearListenPromoTimers]);
 
   useEffect(() => {
     if (!currentAd) {
       setAdZIndex(0);
       return;
     }
-    setAdZIndex(allocatePopupZIndex());
-  }, [currentAd, allocatePopupZIndex]);
+    // Ads open under Listen/CD/game/AI/CD_ROM, over other windows.
+    setAdZIndex(allocatePopupOpenZIndex());
+  }, [currentAd, allocatePopupOpenZIndex]);
+
+  useEffect(() => {
+    if (!showAdDiction) {
+      setPromptZIndex(0);
+      return;
+    }
+    setPromptZIndex(allocatePopupOpenZIndex());
+  }, [showAdDiction, allocatePopupOpenZIndex]);
 
   const iconPositions = useMemo(() => getIconPositions(), []);
 
@@ -121,7 +161,6 @@ export default function Desktop({ isActive = true }) {
   }
 
   function handleCloseAdDictionWindow(instanceId) {
-    setShowOffGrid(false);
     closeWindow(instanceId);
   }
 
@@ -151,6 +190,14 @@ export default function Desktop({ isActive = true }) {
 
     if (id === 'listen') {
       openWindow('listen');
+      clearListenPromoTimers();
+      hasPlayedListenTrackRef.current = false;
+      listenIdleTimerRef.current = window.setTimeout(() => {
+        listenIdleTimerRef.current = null;
+        if (!hasPlayedListenTrackRef.current) {
+          openListenEpPrompt();
+        }
+      }, 60 * 1000);
       return;
     }
 
@@ -210,20 +257,6 @@ export default function Desktop({ isActive = true }) {
   }
 
   const aiWindow = windows.find((win) => win.type === 'ai' && !win.minimized);
-
-  function isPriorityDesktopWindow(win) {
-    return (
-      win.type === 'listen'
-      || win.type === 'rat_race'
-      || win.type === 'cd_player'
-      || win.type === 'ai'
-      || win.appId === 'cd_rom'
-    );
-  }
-
-  function isPopupDesktopWindow(win) {
-    return win.type === 'error' || win.type === 'ad_diction';
-  }
 
   function renderDesktopWindow(win) {
     if (win.minimized && win.type !== 'rat_race') return null;
@@ -291,7 +324,6 @@ export default function Desktop({ isActive = true }) {
           {...shared}
           autoplay={win.autoplay}
           track={win.track}
-          onEject={() => triggerErrorAction(openErrorDialog, 'cd_eject')}
         />
       );
     }
@@ -323,6 +355,55 @@ export default function Desktop({ isActive = true }) {
             const track = getListenTrack(trackId);
             if (!track) return;
             openAudioView(track, { autoplay: true });
+
+            const isFirstTrackClick = !hasPlayedListenTrackRef.current;
+            hasPlayedListenTrackRef.current = true;
+            if (listenIdleTimerRef.current != null) {
+              window.clearTimeout(listenIdleTimerRef.current);
+              listenIdleTimerRef.current = null;
+            }
+            if (isFirstTrackClick) {
+              if (orderCopyTimerRef.current != null) {
+                window.clearTimeout(orderCopyTimerRef.current);
+              }
+              orderCopyTimerRef.current = window.setTimeout(() => {
+                orderCopyTimerRef.current = null;
+                openOrderPhysicalCopy();
+              }, 60 * 1000);
+            }
+          }}
+        />
+      );
+    }
+
+    if (win.type === 'cd_rom') {
+      return (
+        <ShopWindow
+          {...shared}
+          onMetaChange={(meta) => patchWindow(win.instanceId, meta)}
+        />
+      );
+    }
+
+    if (win.type === 'order_physical') {
+      return (
+        <OrderPhysicalCopyWindow
+          {...shared}
+          onOpenCdRom={() => {
+            closeWindow(win.instanceId);
+            openWindow('cd_rom');
+          }}
+        />
+      );
+    }
+
+    if (win.type === 'listen_ep') {
+      return (
+        <ListenEpWindow
+          {...shared}
+          onOpenEp={() => {
+            closeWindow(win.instanceId);
+            openWindow('listen');
           }}
         />
       );
@@ -363,6 +444,16 @@ export default function Desktop({ isActive = true }) {
       );
     }
 
+    if (win.type === 'off_grid') {
+      return (
+        <OffGridWindow
+          {...shared}
+          onClose={() => closeOffGridWindow()}
+          onAction={(actionId) => handleAdPromptAction(actionId)}
+        />
+      );
+    }
+
     if (win.type === 'simple') {
       if (win.image) {
         return (
@@ -385,12 +476,6 @@ export default function Desktop({ isActive = true }) {
     return null;
   }
 
-  const normalWindows = windows.filter((win) => (
-    !isPopupDesktopWindow(win) && !isPriorityDesktopWindow(win)
-  ));
-  const popupWindows = windows.filter((win) => isPopupDesktopWindow(win));
-  const priorityWindows = windows.filter((win) => isPriorityDesktopWindow(win));
-
   return (
     <>
       <main className="desktop" ref={desktopRef} onMouseDown={handleDesktopMouseDown}>
@@ -406,30 +491,22 @@ export default function Desktop({ isActive = true }) {
           />
         ))}
 
-        <div className="desktop__layer desktop__layer--normal">
-          {normalWindows.map((win) => renderDesktopWindow(win))}
-        </div>
-
-        <div className="desktop__layer desktop__layer--popup">
-          {popupWindows.map((win) => renderDesktopWindow(win))}
+        <div className="desktop__layer desktop__layer--windows">
+          {windows.map((win) => renderDesktopWindow(win))}
           <FakeAdOverlay
             src={currentAd}
             zIndex={adZIndex}
             onClose={dismissAd}
-            onFocus={() => setAdZIndex(allocatePopupZIndex())}
+            onFocus={() => setAdZIndex(allocateZIndex())}
             containerRef={desktopRef}
           />
           <AdDictionPrompt
             showAdDiction={showAdDiction}
-            showOffGrid={showOffGrid}
+            zIndex={promptZIndex}
             onAction={handleAdPromptAction}
             onCloseAdDiction={() => setShowAdDiction(false)}
-            onCloseOffGrid={() => setShowOffGrid(false)}
+            onFocus={() => setPromptZIndex(allocateZIndex())}
           />
-        </div>
-
-        <div className="desktop__layer desktop__layer--priority">
-          {priorityWindows.map((win) => renderDesktopWindow(win))}
           <VirusVideo
             isOpen={Boolean(aiWindow)}
             onClose={() => aiWindow && closeWindow(aiWindow.instanceId)}
